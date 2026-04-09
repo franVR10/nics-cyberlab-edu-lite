@@ -1,4 +1,6 @@
 # NICS | CyberLab Lite — Guía de uso (versión low resources)
+![Fondos_INCIBE](https://github.com/nicslabdev/nics-cyberlab-edu-lite/raw/main/logo_fondos_incibe.png)
+This repository is part of the Programa Global de Innovación en Seguridad for the promotion of Cátedras de Ciberseguridad en España, funded by the European Union NextGeneration-EU Funds, through the Instituto Nacional de Ciberseguridad (INCIBE).
 
 ### Mini SOC en local con 3 VMs (Snort + Wazuh + MITRE Caldera)
 
