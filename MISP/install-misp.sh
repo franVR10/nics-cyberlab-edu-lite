@@ -52,7 +52,8 @@ set -e
 # CONFIGURACIÓN
 # ===============================
 MISP_BRANCH="2.5"
-MISP_INSTALLER_URL="https://raw.githubusercontent.com/MISP/MISP/${MISP_BRANCH}/INSTALL/INSTALL.debian${MISP_BRANCH%%.*}.sh"
+DEBIAN_MAJOR="12"
+MISP_INSTALLER_URL="https://raw.githubusercontent.com/MISP/MISP/${MISP_BRANCH}/INSTALL/INSTALL.debian${DEBIAN_MAJOR}.sh"
 MISP_PATH="/var/www/MISP"
 MISP_SETTINGS_FILE="/root/misp_settings.txt"
 MISP_INSTALLER_LOCAL="$LOG_DIR/INSTALL.debian12.sh"
@@ -112,15 +113,14 @@ apt-get install -y curl ca-certificates gnupg lsb-release apt-transport-https gi
 # ===============================
 # DESCARGA DEL INSTALADOR OFICIAL
 # ===============================
-# raw.githubusercontent.com puede devolver 404 puntualmente en según qué
-# edge de su CDN tras cambios en la rama; si pasa, se recurre a git clone
+# Si falla la descarga directa (red, DNS, etc.), se recurre a git clone
 # sobre github.com como alternativa.
 echo "[+] Descargando instalador oficial de MISP (rama ${MISP_BRANCH})..."
 if ! curl -fsSL "$MISP_INSTALLER_URL" -o "$MISP_INSTALLER_LOCAL"; then
     echo "[!] Fallo al descargar vía raw.githubusercontent.com, se prueba con git clone..."
     MISP_CLONE_TMP="$(mktemp -d)"
     git clone --depth 1 --branch "$MISP_BRANCH" https://github.com/MISP/MISP.git "$MISP_CLONE_TMP"
-    cp "$MISP_CLONE_TMP/INSTALL/INSTALL.debian${MISP_BRANCH%%.*}.sh" "$MISP_INSTALLER_LOCAL"
+    cp "$MISP_CLONE_TMP/INSTALL/INSTALL.debian${DEBIAN_MAJOR}.sh" "$MISP_INSTALLER_LOCAL"
     rm -rf "$MISP_CLONE_TMP"
 fi
 chmod +x "$MISP_INSTALLER_LOCAL"
