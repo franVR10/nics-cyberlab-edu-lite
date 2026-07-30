@@ -106,14 +106,23 @@ echo "[+] Actualizando sistema..."
 apt-get update -o Acquire::Retries=3
 apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
-echo "[+] Instalando dependencias previas (curl, lsb-release, gnupg)..."
-apt-get install -y curl ca-certificates gnupg lsb-release apt-transport-https
+echo "[+] Instalando dependencias previas (curl, lsb-release, gnupg, git)..."
+apt-get install -y curl ca-certificates gnupg lsb-release apt-transport-https git
 
 # ===============================
 # DESCARGA DEL INSTALADOR OFICIAL
 # ===============================
+# raw.githubusercontent.com puede devolver 404 puntualmente en según qué
+# edge de su CDN tras cambios en la rama; si pasa, se recurre a git clone
+# sobre github.com como alternativa.
 echo "[+] Descargando instalador oficial de MISP (rama ${MISP_BRANCH})..."
-curl -fsSL "$MISP_INSTALLER_URL" -o "$MISP_INSTALLER_LOCAL"
+if ! curl -fsSL "$MISP_INSTALLER_URL" -o "$MISP_INSTALLER_LOCAL"; then
+    echo "[!] Fallo al descargar vía raw.githubusercontent.com, se prueba con git clone..."
+    MISP_CLONE_TMP="$(mktemp -d)"
+    git clone --depth 1 --branch "$MISP_BRANCH" https://github.com/MISP/MISP.git "$MISP_CLONE_TMP"
+    cp "$MISP_CLONE_TMP/INSTALL/INSTALL.debian${MISP_BRANCH%%.*}.sh" "$MISP_INSTALLER_LOCAL"
+    rm -rf "$MISP_CLONE_TMP"
+fi
 chmod +x "$MISP_INSTALLER_LOCAL"
 
 # ===============================
