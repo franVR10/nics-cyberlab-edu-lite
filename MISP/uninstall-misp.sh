@@ -77,12 +77,21 @@ systemctl stop mariadb 2>/dev/null || true
 # ELIMINAR PAQUETES
 # ===============================
 echo "[+] Eliminando paquetes..."
-apt-get remove --purge -y \
+# Se filtra primero qué paquetes están realmente instalados: si se le pasa a
+# apt-get remove un patrón que no matchea nada (p. ej. tras una instalación
+# fallida a medias), aborta TODA la transacción sin eliminar el resto.
+MISP_PKGS="$(dpkg-query -W -f='${Package}\n' \
     apache2 apache2-utils apache2-bin \
     mariadb-server mariadb-client \
     redis-server supervisor \
     'php8.2*' libapache2-mod-php8.2 \
-    2>/dev/null || true
+    2>/dev/null || true)"
+
+if [[ -n "$MISP_PKGS" ]]; then
+    apt-get remove --purge -y $MISP_PKGS
+else
+    echo "[i] No se encontraron paquetes de MISP instalados."
+fi
 apt-get autoremove --purge -y
 apt-get autoclean -y
 
