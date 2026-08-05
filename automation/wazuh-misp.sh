@@ -343,7 +343,8 @@ cat > "$TMP_INTEGRATION" <<'PYEOF'
 # consultar direcciones IP en lugar de hashes de fichero. Pensado para
 # encadenarse tras la integracion Snort -> Wazuh de wazuh-snort.sh: cuando
 # dispara una regla derivada de Snort (por defecto 600001/600010), consulta
-# la IP origen (srcip) contra los atributos de tipo IP en MISP.
+# el srcip contra los atributos de tipo IP en MISP y, si no hay coincidencia,
+# también el dstip (util para reglas de trafico saliente, p. ej. hacia un C2).
 #
 # ossec.conf:
 # <integration>
@@ -382,8 +383,11 @@ IP_RE = re.compile(r"^(\d{1,3}\.){3}\d{1,3}$")
 # full_log de alert_fast.txt (algunas versiones de Snort anteponen la marca
 # de tiempo a "[**]", lo que rompe su <prematch> y deja "decoder":{} vacío,
 # sin "srcip"). Cuando pasa eso, se extrae la IP directamente del full_log:
-# "... {ICMP} 192.168.1.10 -> 192.168.1.20"
-FULL_LOG_IP_RE = re.compile(r"\{[A-Za-z0-9_]+\}\s+(\d{1,3}(?:\.\d{1,3}){3})\s*->\s*(?:\d{1,3}(?:\.\d{1,3}){3})")
+# "... {ICMP} 192.168.1.10 -> 192.168.1.20" (ICMP, sin puerto) o
+# "... {TCP} 192.168.1.10:46548 -> 192.168.1.20:4444" (TCP/UDP, con puerto).
+FULL_LOG_IP_RE = re.compile(
+    r"\{[A-Za-z0-9_]+\}\s+(\d{1,3}(?:\.\d{1,3}){3})(?::\d+)?\s*->\s*(\d{1,3}(?:\.\d{1,3}){3})(?::\d+)?"
+)
 
 debug_enabled = False
 timeout = 10
@@ -464,58 +468,75 @@ def debug(msg: str) -> None:
             f.write(msg + "\n")
 
 
-def extract_srcip(alert):
+def extract_ips(alert):
     srcip = alert.get("srcip") or alert.get("data", {}).get("srcip")
-    if srcip and IP_RE.match(srcip):
-        return srcip
-    match = FULL_LOG_IP_RE.search(alert.get("full_log", ""))
-    if match:
-        return match.group(1)
-    return None
+    dstip = alert.get("dstip") or alert.get("data", {}).get("dstip")
+    srcip = srcip if srcip and IP_RE.match(srcip) else None
+    dstip = dstip if dstip and IP_RE.match(dstip) else None
+    if srcip is None or dstip is None:
+        match = FULL_LOG_IP_RE.search(alert.get("full_log", ""))
+        if match:
+            srcip = srcip or match.group(1)
+            dstip = dstip or match.group(2)
+    return srcip, dstip
 
 
 def request_misp_info(alert, misp_url, api_key):
     alert_output = {"misp_ip": {}, "integration": "misp_ip"}
 
-    srcip = extract_srcip(alert)
-    if not srcip:
-        debug("# No valid srcip field present in the alert (ni decoder ni full_log)")
+    srcip, dstip = extract_ips(alert)
+    if not srcip and not dstip:
+        debug("# No valid srcip/dstip field present in the alert (ni decoder ni full_log)")
         return None
 
     alert_output["misp_ip"]["found"] = 0
     alert_output["misp_ip"]["source"] = {
         "alert_id": alert.get("id"),
         "rule_id": alert.get("rule", {}).get("id"),
-        "ip": srcip,
+        "srcip": srcip,
+        "dstip": dstip,
     }
 
-    misp_response_data = request_ip_from_api(srcip, alert_output, misp_url, api_key)
-    if misp_response_data is None:
+    # Se consulta primero el origen (caso habitual: escaneo/ataque entrante,
+    # donde el srcip es el atacante externo) y, si no hay coincidencia ni
+    # error, se prueba el destino (trafico saliente hacia un C2 conocido,
+    # p. ej. un intento de exfiltracion, donde el srcip es un host interno
+    # y el dato relevante para MISP es el dstip).
+    for candidate_ip, field in ((srcip, "srcip"), (dstip, "dstip")):
+        if not candidate_ip:
+            continue
+
+        misp_response_data = request_ip_from_api(candidate_ip, alert_output, misp_url, api_key)
+        if misp_response_data is None:
+            return alert_output
+
+        attributes = misp_response_data.get("response", {}).get("Attribute", [])
+        if not attributes:
+            debug("# No information found in MISP for %s (%s)" % (candidate_ip, field))
+            continue
+
+        alert_output["misp_ip"]["found"] = 1
+        misp_attribute = attributes[0]
+        event_uuid = misp_attribute.get("Event", {}).get("uuid")
+        attribute_uuid = misp_attribute.get("uuid")
+
+        alert_output["misp_ip"].update(
+            {
+                "matched_field": field,
+                "ip": candidate_ip,
+                "type": misp_attribute.get("type"),
+                "value": misp_attribute.get("value"),
+                "uuid": attribute_uuid,
+                "timestamp": misp_attribute.get("timestamp"),
+                "event_uuid": event_uuid,
+                "permalink": f"{misp_url}/events/view/{event_uuid}/searchFor:{attribute_uuid}",
+            }
+        )
+
+        if json_options.get("push_sightings"):
+            push_misp_sighting(misp_url, api_key, candidate_ip)
+
         return alert_output
-
-    attributes = misp_response_data.get("response", {}).get("Attribute", [])
-    if not attributes:
-        debug("# No information found in MISP for %s" % srcip)
-        return alert_output
-
-    alert_output["misp_ip"]["found"] = 1
-    misp_attribute = attributes[0]
-    event_uuid = misp_attribute.get("Event", {}).get("uuid")
-    attribute_uuid = misp_attribute.get("uuid")
-
-    alert_output["misp_ip"].update(
-        {
-            "type": misp_attribute.get("type"),
-            "value": misp_attribute.get("value"),
-            "uuid": attribute_uuid,
-            "timestamp": misp_attribute.get("timestamp"),
-            "event_uuid": event_uuid,
-            "permalink": f"{misp_url}/events/view/{event_uuid}/searchFor:{attribute_uuid}",
-        }
-    )
-
-    if json_options.get("push_sightings"):
-        push_misp_sighting(misp_url, api_key, srcip)
 
     return alert_output
 
@@ -676,13 +697,13 @@ cat > "$TMP_RULES" <<'EOF'
   <rule id="600201" level="0">
     <if_sid>600200</if_sid>
     <field name="misp_ip.found">0</field>
-    <description>MISP: IP $(misp_ip.source.ip) sin coincidencias en threat intel</description>
+    <description>MISP: IP $(misp_ip.source.srcip) / $(misp_ip.source.dstip) sin coincidencias en threat intel</description>
   </rule>
 
   <rule id="600202" level="12">
     <if_sid>600200</if_sid>
     <field name="misp_ip.found">1</field>
-    <description>MISP: IP $(misp_ip.source.ip) coincide con evento de threat intel $(misp_ip.event_uuid)</description>
+    <description>MISP: IP $(misp_ip.ip) ($(misp_ip.matched_field)) coincide con evento de threat intel $(misp_ip.event_uuid)</description>
   </rule>
 
   <rule id="600203" level="10">
