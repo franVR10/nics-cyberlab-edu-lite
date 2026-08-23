@@ -3,17 +3,14 @@ PROGRAM tanque_process
     setpoint_temperatura : INT;
     nivel_tanque : INT;
   END_VAR
-  
-  VAR
-    init_done : BOOL := FALSE;
-  END_VAR
 
-  (* Se inicializan los valores base solo al arrancar *)
-  IF NOT init_done THEN
-    setpoint_temperatura := 75;
-    nivel_tanque := 50;
-    init_done := TRUE;
-  END_IF;
+  (* Sabotaje: fuerza un setpoint peligroso EN CADA ciclo de scan (cada
+     500ms), sin condicion de guarda. A diferencia de una escritura Modbus
+     puntual (Ejercicio 2.9), esto no se revierte con una lectura ni con un
+     intento posterior de corregir el valor por Modbus: el propio programa
+     lo vuelve a sobreescribir en el siguiente ciclo. *)
+  setpoint_temperatura := 9999;
+  nivel_tanque := 0;
 
 END_PROGRAM
 

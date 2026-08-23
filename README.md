@@ -2,9 +2,9 @@
 ![Fondos_INCIBE](https://github.com/nicslabdev/nics-cyberlab-edu-lite/raw/main/logo_fondos_incibe.png)
 This repository is part of the Programa Global de Innovación en Seguridad for the promotion of Cátedras de Ciberseguridad en España, funded by the European Union NextGeneration-EU Funds, through the Instituto Nacional de Ciberseguridad (INCIBE).
 
-### Mini SOC en local con 3 VMs (Snort + Wazuh + MITRE Caldera)
+### Mini SOC en local con 3 a 5 VMs (Snort + Wazuh + MITRE Caldera + MISP + OpenPLC)
 
-Este repositorio contiene la versión **Lite / Low Resources** de **NICS | CyberLab**, un entorno de laboratorio **manual y ligero** pensado para usuarios con **recursos limitados** que quieran reproducir el escenario **Level-01 (Mini SOC)** en **local**, utilizando **3 máquinas virtuales**.
+Este repositorio contiene la versión **Lite / Low Resources** de **NICS | CyberLab**, un entorno de laboratorio **manual y ligero** pensado para usuarios con **recursos limitados** que quieran reproducir en **local** el laboratorio completo: **Level-01 (Mini SOC**, 3 VMs), ampliable con **Level-02 (Cyber Threat Intelligence con MISP**, +1 VM) y **Level-03 (seguridad OT/ICS con OpenPLC**, +1 VM).
 
 El objetivo didáctico se mantiene: entrenar un flujo realista de un SOC:
 
@@ -21,15 +21,15 @@ Esta versión **Lite** está diseñada como alternativa para equipos con menos r
 * **Versión automatizada (OpenStack + despliegue integral):** referencia completa del proyecto principal
   → *(repositorio principal con instalación automatizada, niveles y logs integrados)*
 
-* **Versión Lite (este repo):** despliegue **local** en **3 VMs**, con pasos más manuales, pensado para:
+* **Versión Lite (este repo):** despliegue **local** en **3 a 5 VMs** según el nivel, con pasos más manuales, pensado para:
 
   * aprender la arquitectura
   * reducir dependencia de OpenStack
-  * ejecutar ejercicios del Level-01 con infraestructura mínima
+  * ejecutar los ejercicios de Level-01, Level-02 y Level-03 con infraestructura mínima
 
 Los **ejercicios de `lab/README.md`** están disponibles también en esta versión Lite y se pueden ejecutar en local.
 
-> ℹ️ **Estado actual del repo Lite:** incluye scripts por componente (Snort, Wazuh, MITRE Caldera), scripts de automatización de integración (`automation/`) y un script de preparación (`prep-lab.sh`) para facilitar la ejecución de los ejercicios.
+> ℹ️ **Estado actual del repo Lite:** incluye scripts por componente (Snort, Wazuh, MITRE Caldera, MISP, OpenPLC), scripts de automatización de integración (`automation/`) y un script de preparación (`prep-lab.sh`) para facilitar la ejecución de los ejercicios.
 
 ---
 
@@ -37,7 +37,7 @@ Los **ejercicios de `lab/README.md`** están disponibles también en esta versi�
 
 * [1. Qué ofrece este repositorio](#1-qué-ofrece-este-repositorio)
 * [2. Requisitos mínimos y recomendados](#2-requisitos-mínimos-y-recomendados)
-* [3. Arquitectura (3 VMs)](#3-arquitectura-3-vms)
+* [3. Arquitectura (3 a 5 VMs, según nivel)](#3-arquitectura-3-a-5-vms-según-nivel)
 * [4. Preparación rápida de VMs en VMware (manual, por encima)](#4-preparación-rápida-de-vms-en-vmware-manual-por-encima)
 * [5. Flujo recomendado (Quickstart)](#5-flujo-recomendado-quickstart)
 * [6. Logs y evidencias](#6-logs-y-evidencias)
@@ -52,24 +52,34 @@ Los **ejercicios de `lab/README.md`** están disponibles también en esta versi�
 
 Este repositorio le permite:
 
-1. Montar un **Mini SOC** en local con **3 VMs**:
+1. Montar un **Mini SOC** en local con **3 VMs** (Level-01):
 
    * **Snort** como IDS (detección de tráfico)
    * **Wazuh** como SIEM/XDR (ingesta, correlación e investigación)
    * **MITRE Caldera** como Adversary Emulation (generación de actividad controlada)
 
-2. Ejecutar los **ejercicios del laboratorio** (documentados en `lab/README.md`) para entrenar:
+2. Ampliarlo con **inteligencia de amenazas** (Level-02, VM adicional `misp-server`):
+
+   * **MISP** como plataforma de Cyber Threat Intelligence (CTI): eventos, IOCs, feeds, y enriquecimiento automático de alertas de Wazuh.
+
+3. Ampliarlo con **seguridad OT/ICS** (Level-03, VM adicional `plc-server`):
+
+   * **OpenPLC** como PLC simulado (Modbus/TCP), con detección de red, correlación IT-OT, respuesta activa y detección de artefactos más allá de la IP.
+
+4. Ejecutar los **ejercicios del laboratorio** (documentados en `lab/README.md`) para entrenar:
 
    * detecciones (Snort)
    * ingesta/correlación (Wazuh)
    * simulación ofensiva controlada (Caldera)
+   * inteligencia de amenazas (MISP)
+   * seguridad de sistemas de control industrial (OpenPLC)
    * metodología SOC y evidencias
 
-3. Desplegarlo en equipos de recursos escasos, evitando OpenStack.
+5. Desplegarlo en equipos de recursos escasos, evitando OpenStack.
 
 > ⚠️ **Importante:** la filosofía de esta versión Lite es que el usuario haga **solo lo mínimo manual**:
 >
-> * crear las 3 VMs
+> * crear las VMs (3 para Level-01; 4 si se añade Level-02; 5 si se añade Level-03)
 > * ejecutar los scripts de instalación en cada VM
 > * ejecutar la integración en el orden correcto
 > * preparar el entorno del lab y lanzar ejercicios
@@ -78,26 +88,28 @@ Este repositorio le permite:
 
 ## 2. Requisitos mínimos y recomendados
 
-Esta versión está pensada para funcionar en un host modesto, pero con recursos suficientes para 3 VMs simultáneas.
+Esta versión está pensada para funcionar en un host modesto. Los requisitos de host de esta sección son **acumulativos**: si solo va a montar Level-01, use la columna "Solo Level-01"; si añade Level-02 y/o Level-03, sume las VMs correspondientes de la tabla siguiente.
 
 ### Host (máquina física)
 
-|        Recurso |      Mínimo funcional |           Recomendado |
-| -------------: | --------------------: | --------------------: |
-|            CPU |                4 vCPU |                8 vCPU |
-|            RAM |                 12 GB |              16–24 GB |
-|          Disco |            120 GB SSD |           200+ GB SSD |
-| Virtualización | VT-x/AMD-V habilitada | VT-x/AMD-V habilitada |
+|        Recurso | Solo Level-01 (3 VMs) | + Level-02 (4 VMs) | + Level-03 (5 VMs) |          Recomendado (5 VMs) |
+| -------------: | --------------------: | ------------------: | ------------------: | --------------------: |
+|            CPU |                4 vCPU |               6 vCPU |               7 vCPU |               12 vCPU |
+|            RAM |                 12 GB |                17 GB |                19 GB |                 32 GB |
+|          Disco |            120 GB SSD |          160 GB SSD |          180 GB SSD |           300+ GB SSD |
+| Virtualización | VT-x/AMD-V habilitada | VT-x/AMD-V habilitada | VT-x/AMD-V habilitada | VT-x/AMD-V habilitada |
 
 ### VMs del laboratorio (mismo hardware que el escenario base)
 
-> **Importante:** mantenga la configuración de hardware como la del escenario original.
+> **Importante:** mantenga la configuración de hardware como la del escenario original. Las specs de cada VM coinciden con las de `lab/README.md` (sección "Visión general de los escenarios").
 
-| VM                 | Rol                 | CPU |  RAM | Disco | S.O |
-| ------------------ | ------------------- | --: | ---: | ----: | -----: |
-| **snort-server**   | IDS                 |   1 | 2 GB | 20 GB | Debian 12 |
-| **wazuh-manager**  | SIEM/XDR            |   2 | 4 GB | 40 GB | Debian 12 |
-| **caldera-server** | Adversary Emulation |   1 | 2 GB | 20 GB | Debian 12 |
+| VM                 | Rol                          | Nivel     | CPU |     RAM | Disco | S.O |
+| ------------------ | ----------------------------- | --------- | --: | ------: | ----: | -----: |
+| **snort-server**   | IDS                           | Level-01  |   1 |    2 GB | 20 GB | Debian 12 |
+| **wazuh-manager**  | SIEM/XDR                      | Level-01  |   2 |    4 GB | 40 GB | Debian 12 |
+| **caldera-server** | Adversary Emulation           | Level-01  |   1 |    2 GB | 20 GB | Debian 12 |
+| **misp-server**    | CTI (Threat Intelligence)     | Level-02  |   2 | 4-6 GB | 50 GB | Debian 12 |
+| **plc-server**     | PLC simulado (OT/ICS)         | Level-03  |   1 |    2 GB | 20 GB | Debian 12 |
 
 ### Red
 
@@ -107,20 +119,32 @@ Esta versión está pensada para funcionar en un host modesto, pero con recursos
 
 ---
 
-## 3. Arquitectura (3 VMs)
+## 3. Arquitectura (3 a 5 VMs, según nivel)
 
-**Topología básica (local):**
+**Topología básica Level-01 (local):**
 
 * **caldera-server** → genera actividad (nmap/hydra/comandos) contra **snort-server**
 * **snort-server** → detecta tráfico (Snort) y genera logs (`alert_fast`)
 * **wazuh-manager** → recibe eventos del agente en snort-server y permite investigar en dashboard
 
-**Flujo SOC entrenado:**
+**Flujo SOC entrenado (Level-01):**
 
 1. Atacante (Caldera) ejecuta acciones
 2. Snort detecta actividad de red
 3. Wazuh ingesta y correlaciona
 4. Analista investiga, documenta, mejora reglas y reporte
+
+**Ampliación Level-02 (+ `misp-server`):**
+
+* **wazuh-manager** ↔ **misp-server**: enriquecimiento bidireccional. Wazuh consulta a MISP la reputación de IPs de sus alertas (reactivo), y MISP exporta reglas a **snort-server** (proactivo).
+* No se instala ningún agente Wazuh en `misp-server`: se consulta por su API REST, igual que un analista real consultaría una plataforma de CTI externa.
+
+**Ampliación Level-03 (+ `plc-server`):**
+
+* **caldera-server** (vía el agente ya desplegado en `snort-server`) → ataca **plc-server** (Modbus/TCP y HTTP), reutilizando el mismo actor con antecedentes de Level-01/Level-02: el laboratorio modela un ataque transversal IT→OT, no un escenario OT aislado.
+* **snort-server** detecta tanto el tráfico Modbus como la reprogramación HTTP del PLC (inspectores nativos).
+* **wazuh-manager** ↔ **plc-server**: sin agente Wazuh (decisión deliberada, ver `lab/README.md`); el único acceso es un salto SSH puntual para verificación de artefactos (Ejercicio 3.5).
+* No se instala ningún agente Wazuh en `plc-server`, igual que en `misp-server`: la monitorización OT es pasiva, por diseño.
 
 ---
 
@@ -128,7 +152,7 @@ Esta versión está pensada para funcionar en un host modesto, pero con recursos
 
 > Esta sección es intencionalmente breve: es lo único que el usuario debe hacer “a mano” antes de usar el repo.
 
-### 4.1) Crear 3 VMs (plantilla rápida)
+### 4.1) Crear las VMs (plantilla rápida)
 
 En VMware (Workstation/Player):
 
@@ -138,11 +162,11 @@ En VMware (Workstation/Player):
 4. Red: seleccione **NAT**
 5. Marque la opción de instalar **SSH** durante la instalación.
 6. Finalice instalación del SO
-7. Repita para las 3 VMs:
+7. Repita para las VMs de los niveles que vaya a montar:
 
-   * `snort-server`
-   * `wazuh-manager`
-   * `caldera-server`
+   * `snort-server`, `wazuh-manager`, `caldera-server` (Level-01, siempre)
+   * `misp-server` (si añade Level-02)
+   * `plc-server` (si añade Level-03)
 
 ### 4.2) Ajustes recomendados en cada VM
 
@@ -201,11 +225,12 @@ cd nics-cyberlab-lite
 
 ---
 
-### 5.2) Paso 1 — Crear y preparar las 3 VMs
+### 5.2) Paso 1 — Crear y preparar las VMs
 
 Antes de ejecutar scripts del repo:
 
-* Cree `snort-server`, `wazuh-manager` y `caldera-server`
+* Cree `snort-server`, `wazuh-manager` y `caldera-server` (siempre)
+* Cree además `misp-server` si va a montar Level-02, y/o `plc-server` si va a montar Level-03
 * Verifique red NAT y conectividad entre ellas
 * Asegure acceso SSH (recomendado)
 * Compruebe conectividad a Internet
@@ -257,6 +282,33 @@ Verifique:
 
 > ℹ️ **Nota:** Los scripts `uninstall-*.sh` están disponibles en cada carpeta para desinstalación/rollback durante pruebas.
 
+#### 5.3.4) MISP (en `misp-server`) — solo si añade Level-02
+
+```bash
+chmod +x MISP/install-misp.sh
+sudo bash install-misp.sh
+```
+
+Verifique:
+
+* servicio levantado y acceso HTTPS al dashboard (certificado autofirmado, es esperado)
+* credenciales de administrador, guardadas por el propio script en `~/misp-logs/misp-settings.txt`
+
+> ℹ️ Level-02 requiere Level-01 ya desplegado e integrado (`wazuh-snort.sh` ejecutado, paso 5.5.1).
+
+#### 5.3.5) OpenPLC (en `plc-server`) — solo si añade Level-03
+
+```bash
+chmod +x OpenPLC/install-openplc.sh
+sudo bash install-openplc.sh
+```
+
+Verifique:
+
+* servicio levantado y acceso web por puerto `8080` (usuario/contraseña por defecto: `openplc`/`openplc`)
+
+> ℹ️ Level-03 requiere Level-01 ya desplegado e integrado, y el inspector Modbus de Snort habilitado (`prep-openplc-snort.sh`, paso 5.5.3). No requiere Level-02, aunque el laboratorio está pensado para usarse con ambos.
+
 ---
 
 ### 5.4) Paso 3 — Generación de claves (**obligatorio antes de integrar**)
@@ -303,9 +355,24 @@ Objetivo:
 * habilitar la generación de actividad controlada desde Caldera hacia el nodo monitorizado por Snort
 * facilitar validaciones y ejercicios del laboratorio
 
+#### 5.5.3) Integración OpenPLC ↔ Snort (solo si añade Level-03)
+
+```bash
+cd nics-cyberlab-lite/automation
+sudo chmod +x prep-openplc-snort.sh
+sudo bash prep-openplc-snort.sh
+```
+
+Objetivo:
+
+* habilitar los inspectores nativos de Snort (Modbus y HTTP) necesarios para detectar el tráfico contra `plc-server`
+* es idempotente: puede volver a ejecutarse sin duplicar configuración si se actualiza a una versión posterior del script
+
+> ⚠️ **Lo que NO va en este paso: `wazuh-misp.sh` y `wazuh-misp-hash.sh`.** A diferencia de las tres integraciones anteriores (infraestructura pura, transparente para el alumnado), desplegar la integración Wazuh↔MISP es **el propio contenido** del Ejercicio 2.4, y desplegar la integración de hash es el del Ejercicio 3.5 — ejecutarlos aquí de antemano se saltaría el ejercicio. Despliéguelos cuando `lab/README.md` se lo indique, no antes.
+
 > [✓] **Regla general:**
 >
-> * **Instaladores por componente** (`MITRE-Caldera/`, `Snort/`, `Wazuh/`) → ejecutar en la VM correspondiente
+> * **Instaladores por componente** (`MITRE-Caldera/`, `Snort/`, `Wazuh/`, `MISP/`, `OpenPLC/`) → ejecutar en la VM correspondiente
 > * **Integración + keys** (`automation/`) → ejecutar con **`sudo`**
 
 ---
@@ -329,12 +396,14 @@ sudo bash prep-lab.sh
 Con todo desplegado, integrado y preparado:
 
 1. Abra `lab/README.md`
-2. Ejecute los ejercicios propuestos del laboratorio (Level-01 en local)
+2. Ejecute los ejercicios propuestos del laboratorio, en orden: Level-01 (Ejercicios 1.1-1.8), Level-02 (2.0-2.7, si desplegó `misp-server`), Level-03 (3.0-3.6, si desplegó `plc-server`)
 3. Recoja evidencias de:
 
    * tráfico/detección (Snort)
    * eventos/correlación (Wazuh)
    * actividad controlada (Caldera)
+   * inteligencia de amenazas (MISP, si aplica)
+   * proceso industrial simulado (OpenPLC, si aplica)
 
 Ejemplos típicos de validación (según el ejercicio):
 
@@ -342,6 +411,8 @@ Ejemplos típicos de validación (según el ejercicio):
 * `nmap`
 * `hydra`
 * habilidades/operaciones de Caldera
+* consultas a la API REST de MISP
+* lectura/escritura Modbus contra OpenPLC
 
 ---
 
@@ -391,6 +462,41 @@ En versión Lite, **la evidencia se recoge por nodo**, como en un entorno real:
   hydra -h | head
   ```
 
+### MISP (`misp-server`, Level-02)
+
+* Acceso web (certificado autofirmado, es esperado):
+
+  ```text
+  https://IP_MISP
+  ```
+
+* Credenciales de administrador y logs de instalación:
+
+  ```bash
+  cat ~/misp-logs/misp-settings.txt
+  ```
+
+* Log de la integración con Wazuh (una vez desplegada en el Ejercicio 2.4), en `wazuh-manager`:
+
+  ```bash
+  sudo tail -f /var/ossec/logs/integrations.log
+  ```
+
+### OpenPLC (`plc-server`, Level-03)
+
+* Acceso web (por defecto, usuario/contraseña `openplc`/`openplc`):
+
+  ```text
+  http://IP_PLC_SERVER:8080
+  ```
+
+* Log del runtime y PID del proceso:
+
+  ```bash
+  cat ~/openplc-logs/openplc-server.log
+  cat ~/openplc-logs/openplc.pid
+  ```
+
 ---
 
 ## 7. Estructura real del proyecto
@@ -399,9 +505,17 @@ La estructura actual del repositorio (por componente + automatización + lab) es
 
 ```text
 .
+├── MISP/
+│   ├── install-misp.sh
+│   └── uninstall-misp.sh
 ├── MITRE-Caldera/
 │   ├── install-caldera.sh
 │   └── uninstall-caldera.sh
+├── OpenPLC/
+│   ├── install-openplc.sh
+│   ├── uninstall-openplc.sh
+│   ├── tanque_control.st
+│   └── tanque_sabotaje.st
 ├── Snort/
 │   ├── install-snort.sh
 │   └── uninstall-snort.sh
@@ -412,17 +526,31 @@ La estructura actual del repositorio (por componente + automatización + lab) es
 │   ├── caldera-snort.sh
 │   ├── key-generate.sh
 │   ├── prep-lab.sh
+│   ├── prep-openplc-snort.sh
+│   ├── wazuh-misp.sh
+│   ├── wazuh-misp-hash.sh
 │   └── wazuh-snort.sh
 ├── lab/
 │   └── README.md
 └── README.md
 ```
 
+> ℹ️ `automation/` también genera, en tiempo de uso, la clave privada/pública del laboratorio (`mykey`, `mykey.pub`) y sus ficheros `known_hosts_*` — son material local/sensible de cada despliegue, no forman parte de la estructura fija del repositorio y no deben commitearse.
+
 ### Descripción de carpetas
+
+* **`MISP/`**
+
+  * Scripts de instalación/desinstalación de MISP (Level-02).
 
 * **`MITRE-Caldera/`**
 
   * Scripts de instalación/desinstalación de MITRE Caldera.
+
+* **`OpenPLC/`**
+
+  * Scripts de instalación/desinstalación de OpenPLC (Level-03).
+  * Programas de ejemplo en IEC 61131-3 usados en los ejercicios: `tanque_control.st` (legítimo) y `tanque_sabotaje.st` (usado por Caldera en el Ejercicio 3.4).
 
 * **`Snort/`**
 
@@ -434,15 +562,16 @@ La estructura actual del repositorio (por componente + automatización + lab) es
 
 * **`automation/`**
 
-  * Scripts de integración entre herramientas.
-  * Script de generación de claves.
+  * Scripts de integración entre herramientas: `wazuh-snort.sh`, `caldera-snort.sh` (infraestructura, Level-01), `prep-openplc-snort.sh` (infraestructura, Level-03).
+  * `wazuh-misp.sh` y `wazuh-misp-hash.sh`: integraciones con MISP que se despliegan como parte de los Ejercicios 2.4 y 3.5 respectivamente, no como preparación previa (ver sección 5.5).
+  * Script de generación de claves (`key-generate.sh`).
   * Script de preparación del entorno del lab (`prep-lab.sh`).
 
 * **`lab/README.md`**
 
   * Ejercicios y metodología SOC para ejecutar el laboratorio en local.
 
-> ⚠️ **Recuerde:** siempre `key-generate.sh` y los scripts de integración (`wazuh-snort.sh`, `caldera-snort.sh`) deben ejecutarse con **`sudo`**.
+> ⚠️ **Recuerde:** siempre `key-generate.sh` y los scripts de integración (`wazuh-snort.sh`, `caldera-snort.sh`, `prep-openplc-snort.sh`) deben ejecutarse con **`sudo`**.
 
 ---
 
@@ -452,12 +581,13 @@ Los ejercicios están descritos en:
 
 📌 **`lab/README.md`**
 
-Esta versión Lite permite ejecutar el flujo del **Level-01** en local con menos recursos, manteniendo la metodología didáctica:
+Esta versión Lite permite ejecutar en local, con menos recursos, los tres niveles del laboratorio, manteniendo la metodología didáctica:
 
-* detección
-* investigación
-* mejora
-* documentación/reporte
+* **Level-01** (Ejercicios 1.1-1.8): Mini SOC — detección, investigación, mejora, documentación/reporte.
+* **Level-02** (Ejercicios 2.0-2.7): Cyber Threat Intelligence con MISP — enriquecimiento de alertas, feeds, correlación IT.
+* **Level-03** (Ejercicios 3.0-3.6): seguridad OT/ICS con OpenPLC — correlación IT-OT, respuesta activa, detección de artefactos y TTPs, playbook de respuesta a incidentes.
+
+Level-02 y Level-03 son **ampliaciones independientes** de Level-01: puede desplegar solo Level-01, Level-01+02, Level-01+03, o los tres, según qué VMs adicionales monte (sección 2).
 
 > ℹ️ **Nota:** **Diferencia principal respecto al repo automatizado:** cambia el **método de despliegue** (manual/semi-automatizado), pero **los ejercicios y el enfoque SOC siguen siendo aplicables**.
 
@@ -471,6 +601,8 @@ Esta versión Lite permite ejecutar el flujo del **Level-01** en local con menos
   * `snort-server`
   * `wazuh-manager`
   * `caldera-server`
+  * `misp-server` (Level-02)
+  * `plc-server` (Level-03)
 
 * Documente evidencias con:
 
@@ -479,7 +611,7 @@ Esta versión Lite permite ejecutar el flujo del **Level-01** en local con menos
   * comando ejecutado
   * log/alerta/evento correlacionado
 
-* Use la misma **NAT network** en las 3 VMs.
+* Use la misma **NAT network** en todas las VMs desplegadas.
 
 * Revise permisos de ejecución:
 
@@ -558,6 +690,30 @@ cd nics-cyberlab-lite/automation
 ls -l
 ```
 
+---
+
+### 10.5 MISP no responde, o `install-misp.sh` falla (Level-02)
+
+* MISP usa certificado **autofirmado**: un aviso de certificado no confiable en el navegador es esperado, no un error.
+* Compruebe el servicio y el log de instalación:
+
+  ```bash
+  cat ~/misp-logs/misp-install.log
+  ```
+* Si la integración con Wazuh (Ejercicio 2.4) no encuentra coincidencias, confirme primero que el evento en MISP está **`Published`** y el atributo marcado **IDS**, antes de sospechar del script.
+
+---
+
+### 10.6 OpenPLC no arranca, o el puerto 8080/502 no responde (Level-03)
+
+* Compruebe el proceso y el log:
+
+  ```bash
+  cat ~/openplc-logs/openplc-server.log
+  sudo ss -ltnp | grep -E ':(8080|502)'
+  ```
+* Si el puerto aparece ocupado por un proceso viejo que no responde (`Address already in use` en el log), localice el PID real con `ss` (no confíe solo en el fichero `.pid`, puede estar desactualizado) y mátelo antes de relanzar.
+* Sin un programa **compilado y arrancado** (`Start PLC` en la interfaz web), OpenPLC no abre el puerto Modbus (502) aunque la opción esté activada — no es un fallo de red.
 
 ---
 

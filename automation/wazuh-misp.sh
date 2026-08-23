@@ -520,6 +520,12 @@ def request_misp_info(alert, misp_url, api_key):
         event_uuid = misp_attribute.get("Event", {}).get("uuid")
         attribute_uuid = misp_attribute.get("uuid")
 
+        # Se expone tambien como campo de nivel superior (junto a "misp_ip"),
+        # no solo anidado dentro de el: es donde Active Response (firewall-drop)
+        # busca la IP a bloquear (data.srcip), y el decoder nativo de Wazuh no
+        # la decodifica para las alertas de Snort en este laboratorio.
+        alert_output["srcip"] = candidate_ip
+
         alert_output["misp_ip"].update(
             {
                 "matched_field": field,
