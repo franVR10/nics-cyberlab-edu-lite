@@ -219,8 +219,8 @@ Si hay ping, la comunicación base está lista.
 Puede clonar el repo en su host (o en una VM de administración) y después copiarlo a cada VM, o clonarlo directamente en cada una.
 
 ```bash
-git clone https://github.com/crismillan06/nics-cyberlab-lite.git
-cd nics-cyberlab-lite
+git clone https://github.com/franVR10/nics-cyberlab-edu-lite.git
+cd nics-cyberlab-edu-lite
 ```
 
 ---
@@ -316,7 +316,7 @@ Verifique:
 Antes de ejecutar las integraciones, debe ejecutarse el script de generación de claves en el anfitrion:
 
 ```bash
-cd nics-cyberlab-lite/automation
+cd nics-cyberlab-edu-lite/automation
 sudo chmod +x key-generate.sh
 sudo bash key-generate.sh
 ```
@@ -332,7 +332,7 @@ Una vez instaladas las 3 herramientas y generadas las claves, ejecute la integra
 #### 5.5.1) Integración Wazuh ↔ Snort
 
 ```bash
-cd nics-cyberlab-lite/automation
+cd nics-cyberlab-edu-lite/automation
 sudo chmod +x wazuh-snort.sh
 sudo bash wazuh-snort.sh
 ```
@@ -345,7 +345,7 @@ Objetivo:
 #### 5.5.2) Integración Caldera ↔ Snort
 
 ```bash
-cd nics-cyberlab-lite/automation
+cd nics-cyberlab-edu-lite/automation
 sudo chmod +x caldera-snort.sh
 sudo bash caldera-snort.sh
 ```
@@ -358,7 +358,7 @@ Objetivo:
 #### 5.5.3) Integración OpenPLC ↔ Snort (solo si añade Level-03)
 
 ```bash
-cd nics-cyberlab-lite/automation
+cd nics-cyberlab-edu-lite/automation
 sudo chmod +x prep-openplc-snort.sh
 sudo bash prep-openplc-snort.sh
 ```
@@ -382,7 +382,7 @@ Objetivo:
 Una vez desplegadas e integradas las herramientas, ejecute el script de preparación del lab para dejar el entorno listo para completar los ejercicios de `lab/README.md`.
 
 ```bash
-cd nics-cyberlab-lite/automation
+cd nics-cyberlab-edu-lite/automation
 chmod +x prep-lab.sh
 sudo bash prep-lab.sh
 ```
@@ -686,7 +686,7 @@ Síntomas comunes:
 Comprobación rápida:
 
 ```bash
-cd nics-cyberlab-lite/automation
+cd nics-cyberlab-edu-lite/automation
 ls -l
 ```
 
