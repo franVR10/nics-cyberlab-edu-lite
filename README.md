@@ -307,7 +307,7 @@ Verifique:
 
 * servicio levantado y acceso web por puerto `8080` (usuario/contraseña por defecto: `openplc`/`openplc`)
 
-> ℹ️ Level-03 requiere Level-01 ya desplegado e integrado, y el inspector Modbus de Snort habilitado (`prep-openplc-snort.sh`, paso 5.5.3). No requiere Level-02, aunque el laboratorio está pensado para usarse con ambos.
+> ℹ️ Level-03 requiere Level-01 ya desplegado e integrado, y el inspector Modbus de Snort habilitado (`prep-openplc-snort.sh`, paso 5.5.3). Los Ejercicios 3.0 y 3.1 (visibilidad pasiva y cadena de ataque Modbus) no requieren Level-02, pero a partir del Ejercicio 3.2 (correlación con CTI) sí es necesario tener Level-02 desplegado e integrado (`wazuh-misp.sh` ya ejecutado).
 
 ---
 
@@ -587,7 +587,7 @@ Esta versión Lite permite ejecutar en local, con menos recursos, los tres nivel
 * **Level-02** (Ejercicios 2.0-2.7): Cyber Threat Intelligence con MISP — enriquecimiento de alertas, feeds, correlación IT.
 * **Level-03** (Ejercicios 3.0-3.6): seguridad OT/ICS con OpenPLC — correlación IT-OT, respuesta activa, detección de artefactos y TTPs, playbook de respuesta a incidentes.
 
-Level-02 y Level-03 son **ampliaciones independientes** de Level-01: puede desplegar solo Level-01, Level-01+02, Level-01+03, o los tres, según qué VMs adicionales monte (sección 2).
+Level-02 es una **ampliación independiente** de Level-01. Level-03 también parte directamente de Level-01 para sus dos primeros ejercicios (3.0-3.1), pero a partir del Ejercicio 3.2 pasa a requerir Level-02, por lo que para completar el itinerario de Level-03 se recomienda desplegar los tres niveles.
 
 > ℹ️ **Nota:** **Diferencia principal respecto al repo automatizado:** cambia el **método de despliegue** (manual/semi-automatizado), pero **los ejercicios y el enfoque SOC siguen siendo aplicables**.
 

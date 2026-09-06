@@ -167,7 +167,7 @@ Nivel que **incorpora** un proceso industrial simulado (OpenPLC, Modbus/TCP) al 
     * 2 GB de RAM
     * 20 GB de Disco
 
-> **Requisito:** el Level-01 (3 VMs) y el Level-02 (`misp-server`, con `wazuh-misp.sh` ya ejecutado) deben estar desplegados e integrados antes de empezar este nivel, más esta 5ª VM `plc-server`.
+> **Requisito:** el Level-01 (3 VMs) debe estar desplegado e integrado, más esta 5ª VM `plc-server`, para los Ejercicios 3.0-3.1. A partir del Ejercicio 3.2, se necesita además el Level-02 (`misp-server`, con `wazuh-misp.sh` ya ejecutado).
 
 **Flujo operativo (qué se entrena)**
 
