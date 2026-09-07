@@ -4224,6 +4224,11 @@ Cierre del capítulo OT (Ejercicios 3.0-3.5): un playbook formal que conecta cad
 
 * Aplique este playbook al incidente real que generó en los Ejercicios 3.4/3.5: para cada fase, indique la alerta/dato concreto (ID, timestamp, IP, hash) que la sustenta, no una descripción genérica.
 
+### Validación / Troubleshooting
+
+* Si alguna de las alertas de la tabla (`600400`-`600440`) no dispara al repetirla, revise primero el ejercicio donde se define esa regla concreta (3.1-3.5) antes de seguir con el playbook: no tiene sentido redactar una fase sobre una alerta que no ha comprobado que funciona.
+* No hace falta generar un incidente nuevo para este ejercicio: reutilice el mismo que ya generó en los Ejercicios 3.4/3.5 (reprogramación del PLC + verificación de hash).
+
 ### Evidencias a entregar
 
 * Playbook aplicado al incidente real, con la alerta/dato concreto de cada fase.

@@ -5,7 +5,7 @@ set -euo pipefail
 # Integración Wazuh -> MISP (reputación de hash del programa PLC)
 # - Extiende automation/wazuh-misp.sh (reputación de IP) al nivel de
 #   artefacto: cuando dispara la regla de subida HTTP a OpenPLC (600430
-#   por defecto, Ejercicio 2.12), el Wazuh Manager no tiene el hash del
+#   por defecto, Ejercicio 3.4), el Wazuh Manager no tiene el hash del
 #   programa subido (Snort no lo captura), así que este script:
 #     1. Se conecta por SSH a plc-server (único salto de red nuevo de
 #        esta integración) y calcula el sha256 del programa .st más
@@ -15,7 +15,7 @@ set -euo pipefail
 # - Reutiliza la MISMA clave SSH que ya usa todo el laboratorio
 #   (automation/key-generate.sh): se copia una vez a wazuh-manager para
 #   que pueda alcanzar plc-server. No se instala ningún agente ni
-#   servicio permanente en plc-server (Ejercicio 2.8).
+#   servicio permanente en plc-server (Ejercicio 3.0).
 # - Idempotente en la práctica (reaplica configuración sin duplicados).
 # =========================================================
 
@@ -234,7 +234,7 @@ echo
 read -r -p "IP/hostname de plc-server (tal como lo ve wazuh-manager): " PLC_HOST
 [[ -n "$PLC_HOST" ]] || die "La IP/hostname de plc-server no puede estar vacía."
 
-echo "Ojo: 'openplc'/'openplc' (Ejercicio 2.8) es el login de la interfaz WEB de OpenPLC (HTTP),"
+echo "Ojo: 'openplc'/'openplc' (Ejercicio 3.0) es el login de la interfaz WEB de OpenPLC (HTTP),"
 echo "no tiene por qué ser un usuario del sistema operativo con acceso SSH. Indique el usuario"
 echo "con el que YA tiene acceso SSH real a esta VM (a menudo el mismo del resto del laboratorio,"
 echo "p.ej. root); si no lo tiene, instálelo antes con key-generate.sh -u <usuario> -H ${PLC_HOST} --reuse-key -y"
@@ -444,14 +444,14 @@ TMP_INTEGRATION="/tmp/custom-misp_hash_$$.py"
 
 cat > "$TMP_INTEGRATION" <<'PYEOF'
 #!/var/ossec/framework/python/bin/python3
-# Wazuh - MISP program-hash reputation integration (OpenPLC, Ejercicio 2.12.5)
+# Wazuh - MISP program-hash reputation integration (OpenPLC, Ejercicio 3.5)
 #
 # Extiende el patron de custom-misp_ip.py (mismo directorio, misma familia
 # de integraciones) al nivel de artefacto: la alerta que dispara este script
 # (por defecto 600430, subida HTTP a OpenPLC) no trae el hash del programa
 # subido, Snort no lo captura. Este script primero lo obtiene por SSH desde
 # plc-server (unico salto de red nuevo de esta integracion; no se instala
-# nada en plc-server, ver Ejercicio 2.12.5 del laboratorio) y despues
+# nada en plc-server, ver Ejercicio 3.5 del laboratorio) y despues
 # consulta ese hash contra los atributos de tipo sha256 en MISP, igual que
 # custom-misp_ip.py hace con IPs.
 #
@@ -927,8 +927,8 @@ echo "===================================================="
 echo
 echo "Cómo probarlo:"
 echo "  1. Registre el hash de OpenPLC/tanque_sabotaje.st como atributo sha256"
-echo "     en MISP (Ejercicio 2.12.5), marcado IDS."
-echo "  2. Dispare la subida del programa (Ejercicio 2.12.2, la ability de Impact)."
+echo "     en MISP (Ejercicio 3.5), marcado IDS."
+echo "  2. Dispare la subida del programa (Ejercicio 3.4, la ability de Impact)."
 echo "  3. En Wazuh Manager, compruebe:"
 echo "       sudo tail -f /var/ossec/logs/integrations.log"
 echo "       sudo grep -A10 '\"integration\":\"misp_hash\"' /var/ossec/logs/alerts/alerts.json"

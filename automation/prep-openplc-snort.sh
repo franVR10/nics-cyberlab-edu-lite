@@ -12,7 +12,7 @@ set -euo pipefail
 #   reglas con "http_uri" (p. ej. detectar una subida de
 #   programa no autorizada) funcionen.
 # - Es pura fontanería de configuración (sin valor pedagógico
-#   en teclearla a mano); las reglas de detección en sí y el
+#   en teclearla a mano). Las reglas de detección en sí y el
 #   resto de la integración (Wazuh, MISP, Caldera) se hacen
 #   a mano como parte de los ejercicios.
 # - Solo toca snort-server. Idempotente.

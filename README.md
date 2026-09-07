@@ -529,7 +529,7 @@ La estructura actual del repositorio (por componente + automatización + lab) es
 └── README.md
 ```
 
-> ℹ️ `automation/` también genera, en tiempo de uso, la clave privada/pública del laboratorio (`mykey`, `mykey.pub`) y sus ficheros `known_hosts_*` — son material local/sensible de cada despliegue, no forman parte de la estructura fija del repositorio
+> ℹ️ `automation/` también genera, en tiempo de uso, la clave privada/pública del laboratorio (`mykey`, `mykey.pub`) y sus ficheros `known_hosts_*` — son material local/sensible de cada despliegue, no forman parte de la estructura fija del repositorio.
 
 ### Descripción de carpetas
 
@@ -557,7 +557,7 @@ La estructura actual del repositorio (por componente + automatización + lab) es
 * **`automation/`**
 
   * Scripts de integración entre herramientas: `wazuh-snort.sh`, `caldera-snort.sh` (infraestructura, Level-01), `prep-openplc-snort.sh` (infraestructura, Level-03).
-  * `wazuh-misp.sh` y `wazuh-misp-hash.sh`: integraciones con MISP que se despliegan como parte de los Ejercicios 2.4 y 3.5 respectivamente, no como preparación previa
+  * `wazuh-misp.sh` y `wazuh-misp-hash.sh`: integraciones con MISP que se despliegan como parte de los Ejercicios 2.4 y 3.5 respectivamente, no como preparación previa (ver sección 5.5).
   * Script de generación de claves (`key-generate.sh`).
   * Script de preparación del entorno del lab (`prep-lab.sh`).
 
