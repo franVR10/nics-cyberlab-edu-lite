@@ -96,7 +96,7 @@ Esta versión está pensada para funcionar en un host modesto. Los requisitos de
 | -------------: | --------------------: | ------------------: | ------------------: | --------------------: |
 |            CPU |                4 vCPU |               6 vCPU |               7 vCPU |               12 vCPU |
 |            RAM |                 12 GB |                17 GB |                19 GB |                 32 GB |
-|          Disco |            120 GB SSD |          160 GB SSD |          180 GB SSD |           300+ GB SSD |
+|          Disco |            120 GB SSD |          170 GB SSD |          190 GB SSD |           300+ GB SSD |
 | Virtualización | VT-x/AMD-V habilitada | VT-x/AMD-V habilitada | VT-x/AMD-V habilitada | VT-x/AMD-V habilitada |
 
 ### VMs del laboratorio (mismo hardware que el escenario base)
