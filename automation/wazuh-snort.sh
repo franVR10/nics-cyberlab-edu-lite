@@ -22,7 +22,7 @@ STRICT_SNORT_TEST="${STRICT_SNORT_TEST:-yes}" # yes | no
 
 usage() {
   cat <<'USAGE'
-Uso: bash snort-wazuh.sh [opciones]
+Uso: bash wazuh-snort.sh [opciones]
 
 Opciones:
   --dry-run        Muestra el plan y valida SSH. No modifica nada remoto.
@@ -81,10 +81,10 @@ DEFAULT_WAZUH_LOG_FORMAT="snort-fast"
 DEFAULT_SNORT_RULES_FILE="/etc/snort/rules/local.rules"
 DEFAULT_SNORT_LUA_PATH="/etc/snort/snort.lua"
 
-DEFAULT_SNORT_RULE_ICMP_SID="1001001"
-DEFAULT_SNORT_RULE_SYN_SID="1001010"
-DEFAULT_SNORT_RULE_SYN_COUNT="20"
-DEFAULT_SNORT_RULE_SYN_SECONDS="3"
+DEFAULT_SNORT_RULE_ICMP_SID="1000010"
+DEFAULT_SNORT_RULE_SYN_SID="1000011"
+DEFAULT_SNORT_RULE_SYN_COUNT="5"
+DEFAULT_SNORT_RULE_SYN_SECONDS="20"
 
 WAZUH_PORT_DATA="1514"
 WAZUH_PORT_ENROLL="1515"
@@ -511,7 +511,7 @@ cat > "$TMP_NEW" <<EOF
 
 # BEGIN NICS_LAB SNORT RULES
 alert icmp any any -> any any (
-    msg:"Intento ICMPv4 detectado";
+    msg:"ICMP Echo Request detectado";
     sid:${ICMP_SID};
     rev:1;
 )
@@ -519,7 +519,7 @@ alert icmp any any -> any any (
 alert tcp any any -> any any (
     flags:S;
     flow:stateless;
-    msg:"Nmap TCP SYN scan";
+    msg:"Posible TCP SYN scan detectado";
     detection_filter:track by_src, count ${SYN_COUNT}, seconds ${SYN_SECONDS};
     sid:${SYN_SID};
     rev:1;
@@ -810,14 +810,14 @@ RULE_FILE="/var/ossec/etc/rules/snort_local_rules.xml"
 TMP_RULES="/tmp/snort_local_rules_wazuh_$$.xml"
 cat > "$TMP_RULES" <<'EOF'
 <group name="local,snort,network,scan,">
-  <rule id="600001" level="7">
-    <match>Intento ICMPv4 detectado</match>
-    <description>Snort ICMP detection</description>
+  <rule id="600001" level="5">
+    <match>ICMP Echo Request detectado</match>
+    <description>Snort - ICMP Echo Request detected</description>
   </rule>
 
   <rule id="600010" level="8">
-    <match>Nmap TCP SYN scan</match>
-    <description>Snort scan activity detected</description>
+    <match>Posible TCP SYN scan detectado</match>
+    <description>Snort - TCP SYN scan activity detected</description>
   </rule>
 </group>
 EOF
@@ -890,7 +890,7 @@ echo "  [Snort] Ver log de alertas:"
 echo "    sudo tail -f ${SNORT_LOG_FILE}"
 echo
 echo "  [Snort] Ver reglas locales:"
-echo "    sudo grep -nE 'Intento ICMPv4 detectado|Nmap TCP SYN scan' ${SNORT_RULES_FILE}"
+echo "    sudo grep -nE 'ICMP Echo Request detectado|Posible TCP SYN scan detectado' ${SNORT_RULES_FILE}"
 echo
 echo "  [Snort] Estado wazuh-agent:"
 echo "    sudo systemctl status wazuh-agent"

@@ -143,7 +143,7 @@ Esta versión está pensada para funcionar en un host modesto. Los requisitos de
 
 * **caldera-server** (vía el agente ya desplegado en `snort-server`) → ataca **plc-server** (Modbus/TCP y HTTP), reutilizando el mismo actor con antecedentes de Level-01/Level-02: el laboratorio modela un ataque transversal IT→OT, no un escenario OT aislado.
 * **snort-server** detecta tanto el tráfico Modbus como la reprogramación HTTP del PLC (inspectores nativos).
-* **wazuh-manager** ↔ **plc-server**: sin agente Wazuh (decisión deliberada, ver `lab/README.md`); el único acceso es un salto SSH puntual para verificación de artefactos (Ejercicio 3.5).
+* **wazuh-manager** ↔ **plc-server**: sin agente Wazuh (decisión deliberada, ver `lab/README.md`). El único acceso es un salto SSH puntual para verificación de artefactos (Ejercicio 3.5).
 * No se instala ningún agente Wazuh en `plc-server`, igual que en `misp-server`: la monitorización OT es pasiva, por diseño.
 
 ---
@@ -366,9 +366,6 @@ sudo bash prep-openplc-snort.sh
 Objetivo:
 
 * habilitar los inspectores nativos de Snort (Modbus y HTTP) necesarios para detectar el tráfico contra `plc-server`
-* es idempotente: puede volver a ejecutarse sin duplicar configuración si se actualiza a una versión posterior del script
-
-> ⚠️ **Lo que NO va en este paso: `wazuh-misp.sh` y `wazuh-misp-hash.sh`.** A diferencia de las tres integraciones anteriores (infraestructura pura, transparente para el alumnado), desplegar la integración Wazuh↔MISP es **el propio contenido** del Ejercicio 2.4, y desplegar la integración de hash es el del Ejercicio 3.5 — ejecutarlos aquí de antemano se saltaría el ejercicio. Despliéguelos cuando `lab/README.md` se lo indique, no antes.
 
 > [✓] **Regla general:**
 >
@@ -386,9 +383,6 @@ cd nics-cyberlab-edu-lite/automation
 chmod +x prep-lab.sh
 sudo bash prep-lab.sh
 ```
-
-> ℹ️ **Nota:** si `prep-lab.sh` realiza cambios del sistema (paquetes, permisos, servicios, rutas, etc.), ejecútelo con `sudo`:
-
 ---
 
 ### 5.7) Paso 6 — Ejecutar ejercicios (`lab/README.md`)
@@ -425,7 +419,7 @@ En versión Lite, **la evidencia se recoge por nodo**, como en un entorno real:
 * Snort en ejecución (ejemplo):
 
   ```bash
-  sudo snort -i ens3 -c /etc/snort/snort.lua -A alert_fast -k none -l /var/log/snort
+  sudo snort -i ens33 -c /etc/snort/snort.lua -A alert_fast -k none -l /var/log/snort
   ```
 
 * Alertas:
@@ -535,7 +529,7 @@ La estructura actual del repositorio (por componente + automatización + lab) es
 └── README.md
 ```
 
-> ℹ️ `automation/` también genera, en tiempo de uso, la clave privada/pública del laboratorio (`mykey`, `mykey.pub`) y sus ficheros `known_hosts_*` — son material local/sensible de cada despliegue, no forman parte de la estructura fija del repositorio y no deben commitearse.
+> ℹ️ `automation/` también genera, en tiempo de uso, la clave privada/pública del laboratorio (`mykey`, `mykey.pub`) y sus ficheros `known_hosts_*` — son material local/sensible de cada despliegue, no forman parte de la estructura fija del repositorio
 
 ### Descripción de carpetas
 
@@ -563,7 +557,7 @@ La estructura actual del repositorio (por componente + automatización + lab) es
 * **`automation/`**
 
   * Scripts de integración entre herramientas: `wazuh-snort.sh`, `caldera-snort.sh` (infraestructura, Level-01), `prep-openplc-snort.sh` (infraestructura, Level-03).
-  * `wazuh-misp.sh` y `wazuh-misp-hash.sh`: integraciones con MISP que se despliegan como parte de los Ejercicios 2.4 y 3.5 respectivamente, no como preparación previa (ver sección 5.5).
+  * `wazuh-misp.sh` y `wazuh-misp-hash.sh`: integraciones con MISP que se despliegan como parte de los Ejercicios 2.4 y 3.5 respectivamente, no como preparación previa
   * Script de generación de claves (`key-generate.sh`).
   * Script de preparación del entorno del lab (`prep-lab.sh`).
 
@@ -587,7 +581,7 @@ Esta versión Lite permite ejecutar en local, con menos recursos, los tres nivel
 * **Level-02** (Ejercicios 2.0-2.7): Cyber Threat Intelligence con MISP — enriquecimiento de alertas, feeds, correlación IT.
 * **Level-03** (Ejercicios 3.0-3.6): seguridad OT/ICS con OpenPLC — correlación IT-OT, respuesta activa, detección de artefactos y TTPs, playbook de respuesta a incidentes.
 
-Level-02 es una **ampliación independiente** de Level-01. Level-03 también parte directamente de Level-01 para sus dos primeros ejercicios (3.0-3.1), pero a partir del Ejercicio 3.2 pasa a requerir Level-02, por lo que para completar el itinerario de Level-03 se recomienda desplegar los tres niveles.
+Level-01 es la base obligatoria del laboratorio: ni Level-02 ni Level-03 son niveles autónomos, ambos se despliegan sobre Level-01 ya integrado (Level-02, en concreto, lo necesita desde el Ejercicio 2.4). Entre sí, Level-02 y Level-03 son independientes solo hasta cierto punto: puede añadir Level-02 sin Level-03, y Level-03 funciona sin Level-02 únicamente para sus dos primeros ejercicios (3.0-3.1); a partir del Ejercicio 3.2, Level-03 pasa a necesitar Level-02 ya desplegado e integrado, así que completar el itinerario de Level-03 exige desplegar también Level-02.
 
 > ℹ️ **Nota:** **Diferencia principal respecto al repo automatizado:** cambia el **método de despliegue** (manual/semi-automatizado), pero **los ejercicios y el enfoque SOC siguen siendo aplicables**.
 

@@ -20,7 +20,7 @@ fi
 LOCAL_USER="$SUDO_USER"
 LOCAL_USER_HOME=$(eval echo "~$LOCAL_USER")
 
-echo "INCIANDO DEPLIEGUE DE WAZUH - NICS-CYBERLAB "
+echo "INICIANDO DESPLIEGUE DE WAZUH - NICS-CYBERLAB"
 echo "----------------------------------------------------"
 echo "[i] Usuario real: $LOCAL_USER"
 echo "[i] HOME real: $LOCAL_USER_HOME"

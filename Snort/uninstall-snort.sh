@@ -6,14 +6,14 @@
 # ===== Comprobación de root =====
 if [[ $EUID -ne 0 ]]; then
    echo "[✖] Este script debe ejecutarse como root."
-   echo "    Usa: sudo bash uninstall-snort3.sh"
+   echo "    Usa: sudo bash uninstall-snort.sh"
    exit 1
 fi
 
 # ===== Detectar usuario real =====
 if [[ -z "$SUDO_USER" ]]; then
     echo "[✖] Este script debe ejecutarse con sudo, no como root directo."
-    echo "    Usa: sudo bash uninstall-snort3.sh"
+    echo "    Usa: sudo bash uninstall-snort.sh"
     exit 1
 fi
 

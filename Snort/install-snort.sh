@@ -6,14 +6,14 @@
 # ===== Comprobación de root =====
 if [[ $EUID -ne 0 ]]; then
    echo "[✖] Este script debe ejecutarse como root."
-   echo "    Usa: sudo bash install-snort3.sh"
+   echo "    Usa: sudo bash install-snort.sh"
    exit 1
 fi
 
 # ===== Detectar usuario real =====
 if [[ -z "$SUDO_USER" ]]; then
     echo "[✖] Este script debe ejecutarse con sudo, no como root directo."
-    echo "    Usa: sudo bash install-snort3.sh"
+    echo "    Usa: sudo bash install-snort.sh"
     exit 1
 fi
 
@@ -104,6 +104,12 @@ cp -r /usr/local/snort3/etc/snort/* /etc/snort/
 tee /etc/snort/snort.lua > /dev/null <<'EOL'
 RULE_PATH = "/etc/snort/rules"
 LOCAL_RULES = RULE_PATH .. "/local.rules"
+-- HOME_NET/EXTERNAL_NET: sin valor por defecto en esta configuracion minima.
+-- Necesarias porque las reglas NIDS exportadas por MISP (Ejercicio 2.5) usan
+-- la variable $HOME_NET; sin definirla, Snort falla con
+-- "undefined variable in the string: $HOME_NET" al cargarlas.
+HOME_NET = 'any'
+EXTERNAL_NET = 'any'
 daq = { modules = { { name = "afpacket" } } }
 ips = { enable_builtin_rules = false, include = { LOCAL_RULES } }
 alert_fast = { file = true }
@@ -112,8 +118,8 @@ EOL
 
 # Reglas locales
 tee /etc/snort/rules/local.rules > /dev/null <<'EOL'
-alert icmp any any -> any any (msg:"Intento ICMPv4 detectado"; sid:1000010; rev:1;)
-#alert tcp any any -> any any (msg:"Nmap TCP SYN scan"; flow:stateless; flags:S; detection_filter:track by_src, count 5, seconds 20; sid:1000011; rev:2;)
+alert icmp any any -> any any (msg:"ICMP Echo Request detectado"; sid:1000010; rev:1;)
+#alert tcp any any -> any any (msg:"Posible TCP SYN scan detectado"; flow:stateless; flags:S; detection_filter:track by_src, count 5, seconds 20; sid:1000011; rev:2;)
 EOL
 
 mkdir -p /var/log/snort

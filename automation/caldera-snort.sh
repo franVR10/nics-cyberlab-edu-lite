@@ -78,7 +78,7 @@ warn() { echo "[!] $*"; }
 usage() {
   cat <<'EOF'
 Uso:
-  ./caldera-agent-deploy-idempotente.sh [opciones]
+  ./caldera-snort.sh [opciones]
 
 SSH / acceso:
   -u, --ssh-user USER           Usuario SSH remoto (default: debian)
@@ -114,10 +114,10 @@ Otros:
   -h, --help                    Mostrar ayuda
 
 Ejemplos:
-  ./caldera-agent-deploy-idempotente.sh -u ubuntu -k ./mykey \
+  ./caldera-snort.sh -u ubuntu -k ./mykey \
     --caldera-host 192.168.56.10 --hosts "192.168.56.20,192.168.56.30" --all -y
 
-  ./caldera-agent-deploy-idempotente.sh -u root -k ./mykey \
+  ./caldera-snort.sh -u root -k ./mykey \
     --caldera-url https://caldera.lab.local:8443 --caldera-insecure \
     -f hosts.txt --all -y --service-mode systemd
 EOF

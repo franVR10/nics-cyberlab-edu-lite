@@ -39,7 +39,7 @@ wrn() { echo "[!] $*"; }
 usage() {
   cat <<'EOF'
 Uso:
-  ./prep_ssh_lab_idempotente.sh [opciones]
+  ./key-generate.sh [opciones]
 
 Opciones:
   -u, --user USER           Usuario SSH remoto (ej: ubuntu, kali, root)
@@ -61,9 +61,9 @@ Opciones:
   -h, --help                Mostrar ayuda
 
 Ejemplos:
-  ./prep_ssh_lab_idempotente.sh -u ubuntu -H "192.168.56.10,192.168.56.11" --all -y
-  ./prep_ssh_lab_idempotente.sh -u kali -f hosts.txt --pick "1 3" --copy-method manual
-  ./prep_ssh_lab_idempotente.sh -u root -H "10.0.0.5" --regen-key -y
+  ./key-generate.sh -u ubuntu -H "192.168.56.10,192.168.56.11" --all -y
+  ./key-generate.sh -u kali -f hosts.txt --pick "1 3" --copy-method manual
+  ./key-generate.sh -u root -H "10.0.0.5" --regen-key -y
 EOF
 }
 
